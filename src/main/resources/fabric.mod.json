@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "inventory",
+  "version": "1.0.0",
+  "name": "Configured Keep Inventory",
+  "description": "A Server-Side mod that allows you to control how much items drop on death",
+  "authors": [
+    "OverlordsIII"
+  ],
+  "license": "CC0-1.0",
+  "icon": "assets/inventory/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.overlordsiii.ConfiguredKeepInventory"
+    ]
+  },
+  "mixins": [
+    "inventory.config.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.9.1+build.205",
+    "minecraft": "1.16.2"
+  }
+}
