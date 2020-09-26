@@ -10,3 +10,5 @@ To turn the mod on, do /inventory on
 To turn the mod off, do /inventory off
 
 To get the current percent value, do /inventory get
+
+More features coming soon.
