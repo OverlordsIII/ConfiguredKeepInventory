@@ -1,4 +1,5 @@
 #Configured Keep Inventory
+
 This is a fabric mod that allows you to control how many items leave and stay in your inventory when you die.
 
 The mod uses commands to change config values, but you can change them manually by editing the `inventoryconfig.json5` file located in your minecraft's config directory.
