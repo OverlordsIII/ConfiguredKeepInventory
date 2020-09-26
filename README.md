@@ -1,4 +1,4 @@
-#Configured Keep Inventory
+# Configured Keep Inventory
 
 This is a fabric mod that allows you to control how many items leave and stay in your inventory when you die.
 
