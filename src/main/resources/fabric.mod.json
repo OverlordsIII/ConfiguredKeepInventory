@@ -1,14 +1,18 @@
 {
   "schemaVersion": 1,
-  "id": "inventory",
+  "id": "inventoryconfig",
   "version": "1.0.0",
   "name": "Configured Keep Inventory",
   "description": "A Server-Side mod that allows you to control how much items drop on death",
   "authors": [
     "OverlordsIII"
   ],
-  "license": "CC0-1.0",
-  "icon": "assets/inventory/icon.png",
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/get-off-my-lawn",
+    "sources": "https://github.com/OverlordsIII/ConfiguredKeepInventory"
+  },
+  "license": "MIT",
+  "icon": "assets/kingdomcraft/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -20,6 +24,6 @@
   ],
   "depends": {
     "fabricloader": ">=0.9.1+build.205",
-    "minecraft": "1.16.2"
+    "minecraft": "1.16.x"
   }
 }

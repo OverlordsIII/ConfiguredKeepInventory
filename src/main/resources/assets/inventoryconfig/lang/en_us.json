@@ -1,0 +1,4 @@
+{
+  "droprate.show": "The Current inventory droprate is set to %d",
+  "inventory.set": "Set the inventory droprate to %d"
+}

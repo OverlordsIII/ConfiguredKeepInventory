@@ -17,8 +17,6 @@ public class ConfiguredKeepInventory implements ModInitializer {
     }
     public static InventoryConfig Config = AutoConfig.getConfigHolder(InventoryConfig.class).getConfig();
     @Override
-    @Environment(EnvType.CLIENT)
     public void onInitialize() {
-
     }
 }

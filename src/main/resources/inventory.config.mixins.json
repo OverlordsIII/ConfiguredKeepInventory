@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "CommandManagerInject",
+    "EnchantmentHelperMixin",
     "PlayerInventoryMixin",
     "ServerPlayerEntityMixin"
   ],
