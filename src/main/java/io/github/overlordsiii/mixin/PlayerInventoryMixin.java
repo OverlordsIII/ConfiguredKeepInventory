@@ -47,7 +47,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryDuck {
                 ItemStack stack = list.get(i);
                 //if stack is not empty
                 if (!stack.isEmpty()) {
-                    System.out.println("stack");
+                    System.out.println(stack);
                     //find the percent for which we need to multiply
                     double percent = ConfiguredKeepInventory.Config.configdroprate / 100.0;
                     System.out.println("decimal percent = " + percent + " percent = " + ConfiguredKeepInventory.Config.configdroprate);
@@ -58,7 +58,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryDuck {
                     if (EnchantmentHelper.hasVanishingCurse(stack)) {
                         list.set(i, ItemStack.EMPTY);
                     }
-                    //if the stack isnt in thje names and items save list
+                    //if the stack isnt in the names and items save list
                     else if (!ConfiguredKeepInventory.Config.namesSavedList.contains(stack.getName().asString()) && !ConfiguredKeepInventory.Config.itemsSavedList.contains(stack.getItem().toString())){
                         //decrement the original stack by the droprate found in the config
                         stack.decrement(((int) Math.round(newStackCount)));
@@ -81,5 +81,10 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryDuck {
     public void sortOffHand(ItemStack stack) {
 
         }
+
+    @Override
+    public void sortHotBar(DefaultedList<ItemStack> stack) {
+
     }
+}
 
