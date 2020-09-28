@@ -29,7 +29,7 @@ public class InventoryCommand
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher){
         dispatcher.register(literal("inventory")
-            .requires(source -> source.hasPermissionLevel(2))
+            .requires(source -> ConfiguredKeepInventory.Config.needsOP ? source.hasPermissionLevel(2) : source.hasPermissionLevel(0))
                 .then(literal("set")
                     .then(argument("percentage", integer(0, 100))
                         .executes(ctx -> execute(ctx, getInteger(ctx, "percentage")))))
@@ -49,13 +49,25 @@ public class InventoryCommand
                     .then(literal("name"))
                         .then(argument("name", StringArgumentType.string())
                             .executes(context -> executeAddName(context, StringArgumentType.getString(context, "name")))))
-                .then (literal("remove")
-                        .then(literal("item")
-                            .then(argument("item", ItemStackArgumentType.itemStack())
-                                .executes(context -> executeRemoveItem(context, ItemStackArgumentType.getItemStackArgument(context, "item").getItem()))))
-                        .then(literal("name")
-                            .then(argument("name", StringArgumentType.string())
-                                .executes(context -> executeRemoveName(context, StringArgumentType.getString(context, "name")))))));
+                .then(literal("remove")
+                    .then(literal("item")
+                        .then(argument("item", ItemStackArgumentType.itemStack())
+                            .executes(context -> executeRemoveItem(context, ItemStackArgumentType.getItemStackArgument(context, "item").getItem()))))
+                    .then(literal("name")
+                        .then(argument("name", StringArgumentType.string())
+                            .executes(context -> executeRemoveName(context, StringArgumentType.getString(context, "name"))))))
+                .then(literal("enable")
+                    .then(literal("vanishing")
+                        .executes(context -> executeEnchantEnable("vanishing", context))))
+                    .then(literal("binding")
+                        .executes(context -> executeEnchantEnable("binding", context)))
+                .then(literal("help")
+                    .executes(InventoryCommand::executeSummary))
+                .then(literal("disable")
+                    .then(literal("vanishing")
+                        .executes(context -> executeEnchantDisable("vanishing", context))))
+                    .then(literal("binding")
+                        .executes(context -> executeEnchantDisable("binding", context))));
     }
     public static int execute(CommandContext<ServerCommandSource> ctx, int value) {
         ConfiguredKeepInventory.Config.configdroprate = value;
@@ -90,6 +102,39 @@ public class InventoryCommand
         }
         entity.sendMessage(new TranslatableText("vanishingenabled.show", config.disableVanishingCurse).formatted(Formatting.AQUA), false);
         entity.sendMessage(new TranslatableText("bindingdisabled.show", config.disableBindingCurse).formatted(Formatting.AQUA), false);
+        return 1;
+    }
+    public static int executeEnchantEnable(String enchant, CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+
+        switch (enchant){
+            case "vanishing":
+                ConfiguredKeepInventory.Config.disableVanishingCurse = true;
+
+            case "binding":
+                ConfiguredKeepInventory.Config.disableBindingCurse = true;
+
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + enchant);
+        }
+        ConfiguredKeepInventory.manager.save();
+        ctx.getSource().getPlayer().sendMessage(new TranslatableText("enchant.enable", enchant), false);
+        return 1;
+    }
+    public static int executeEnchantDisable(String enchant, CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
+        switch (enchant){
+            case "vanishing":
+                ConfiguredKeepInventory.Config.disableVanishingCurse = false;
+
+            case "binding":
+                ConfiguredKeepInventory.Config.disableBindingCurse = false;
+
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + enchant);
+        }
+        ConfiguredKeepInventory.manager.save();
+        ctx.getSource().getPlayer().sendMessage(new TranslatableText("enchant.disable", enchant), false);
         return 1;
     }
     public static int executeSummary(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {

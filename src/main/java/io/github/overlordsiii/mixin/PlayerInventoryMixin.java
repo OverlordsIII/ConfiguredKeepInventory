@@ -3,8 +3,8 @@ package io.github.overlordsiii.mixin;
 
 
 import io.github.overlordsiii.ConfiguredKeepInventory;
+import io.github.overlordsiii.mixinterfaces.PlayerInventoryDuck;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -22,12 +22,14 @@ import java.util.Iterator;
 import java.util.List;
 
 @Mixin(PlayerInventory.class)
-public abstract class PlayerInventoryMixin {
+public abstract class PlayerInventoryMixin implements PlayerInventoryDuck {
 
 
     @Shadow @Final private List<DefaultedList<ItemStack>> combinedInventory;
 
     @Shadow @Final public PlayerEntity player;
+
+    @Shadow @Final public DefaultedList<ItemStack> offHand;
 
     @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z"))
     private boolean droredirect(Iterator iterator){
@@ -74,4 +76,10 @@ public abstract class PlayerInventoryMixin {
         }
     }
     }
-}
+
+    @Override
+    public void sortOffHand(ItemStack stack) {
+
+        }
+    }
+

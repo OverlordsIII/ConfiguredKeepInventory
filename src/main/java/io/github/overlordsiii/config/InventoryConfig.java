@@ -23,4 +23,6 @@ public class InventoryConfig implements ConfigData {
     public boolean disableVanishingCurse = false;
     @Comment("Makes Binding curses ineffective. This means that even if an item has binding is can still be moved around the inventory if this is turned on")
     public boolean disableBindingCurse = false;
+    @Comment("Makes sure you need op to do any of the inventory commands. Defaults to true. Requires a game restart to apply")
+    public boolean needsOP = true;
 }
