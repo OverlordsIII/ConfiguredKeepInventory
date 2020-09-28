@@ -11,9 +11,7 @@ import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
@@ -26,9 +24,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
     private boolean redirect(GameRules gameRules, GameRules.Key<GameRules.BooleanRule> rule){
         return gameRules.getBoolean(GameRules.KEEP_INVENTORY) || ConfiguredKeepInventory.Config.enableConfig;
     }
-    @Inject(method = "playerTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;getStack(I)Lnet/minecraft/item/ItemStack;", shift = At.Shift.BEFORE))
-    private void updateHotbar(CallbackInfo ci){
-        System.out.println(this.inventory.selectedSlot);
-    }
+
 
 }

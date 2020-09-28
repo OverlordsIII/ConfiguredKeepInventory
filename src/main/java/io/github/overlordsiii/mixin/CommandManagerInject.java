@@ -24,6 +24,5 @@ public abstract class CommandManagerInject {
         if (ConfiguredKeepInventory.Config.commandUsage && ConfiguredKeepInventory.Config.enableConfig) {
             InventoryCommand.register(dispatcher);
         }
-        System.out.println("tried to register");
     }
 }

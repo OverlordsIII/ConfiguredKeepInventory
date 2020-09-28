@@ -71,6 +71,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryDuck {
                         this.player.dropItem(copyStack, true);
                         //validate that the inventory has recived the decrement changes to it
                         list.set(i, stack);
+
                     }
                 }
         }

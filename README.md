@@ -11,12 +11,10 @@ The mod uses commands to change config values, but you can change them manually 
 * disabling of the binding curse
 
 ## Inventory Command
-To interact with the mod, do /inventory set (percent) the percent is the value of items that will drop when you die. The rest of the items not affected by this will stay in your inventory.
+To interact with the mod, do /inventory to access the commands. A full tree of the command is listed below.
 
-To turn the mod on, do /inventory on
-
-To turn the mod off, do /inventory off
-
-To get the current percent value, do /inventory get
+* /inventory
+    *  set (number from 1 to 100) sets the inventory droprate to a percentage. This percentage is the number of items that drop when you die
+    * 
 
 More features coming soon.

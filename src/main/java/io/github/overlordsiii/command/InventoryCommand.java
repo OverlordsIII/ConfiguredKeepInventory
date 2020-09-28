@@ -22,11 +22,9 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 
 
-public class InventoryCommand
+public class InventoryCommand {
 
-{
-
-
+    //TODO redo the Translatable text cuz lang wasnt working
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher){
         dispatcher.register(literal("inventory")
             .requires(source -> ConfiguredKeepInventory.Config.needsOP ? source.hasPermissionLevel(2) : source.hasPermissionLevel(0))
@@ -37,12 +35,9 @@ public class InventoryCommand
                     .executes(context -> executeOn(context, true)))
                 .then(literal("off")
                     .executes(context -> executeOn(context, false)))
-                .then(literal("get")
-                    .then(literal("info")
+                .then(literal("info")
                         .executes(InventoryCommand::executeGet))
-                    .then(literal("summary")
-                        .executes(InventoryCommand::executeSummary)))
-                .then (literal("add")
+                .then(literal("add")
                     .then(literal("item")
                         .then(argument("item", ItemStackArgumentType.itemStack())
                             .executes(context -> executeAddItem(context, ItemStackArgumentType.getItemStackArgument(context, "item").getItem()))))
@@ -72,31 +67,35 @@ public class InventoryCommand
     public static int execute(CommandContext<ServerCommandSource> ctx, int value) {
         ConfiguredKeepInventory.Config.configdroprate = value;
         ConfiguredKeepInventory.manager.save();
-        ctx.getSource().sendFeedback(new TranslatableText("inventory.set", value), true);
+      //  ctx.getSource().sendFeedback(new TranslatableText("inventory.set", value), true);
+        ctx.getSource().sendFeedback(new LiteralText("set the inventory droprate to " + value + " percent").formatted(Formatting.AQUA), true);
         return 1;
     }
     public static int executeOn(CommandContext<ServerCommandSource> ctx, boolean onoroff){
         if (onoroff){
             ConfiguredKeepInventory.Config.enableConfig = true;
             ConfiguredKeepInventory.manager.save();
+            ctx.getSource().sendFeedback(new LiteralText("the config has been turned on").formatted(Formatting.GREEN), true);
         }
         else{
             ConfiguredKeepInventory.Config.enableConfig = false;
             ConfiguredKeepInventory.manager.save();
+            ctx.getSource().sendFeedback(new LiteralText("the config has been turned off").formatted(Formatting.RED), true);
         }
-        ctx.getSource().sendFeedback(new TranslatableText("config.on").formatted(Formatting.GREEN), true);
+       // ctx.getSource().sendFeedback(new TranslatableText("config.on").formatted(Formatting.GREEN), true);
+
         return 1;
     }
     public static int executeGet(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         ServerPlayerEntity entity = ctx.getSource().getPlayer();
         InventoryConfig config = ConfiguredKeepInventory.Config;
-        entity.sendMessage(new TranslatableText("showing.mod.info").formatted(Formatting.AQUA), false);
-        entity.sendMessage(new TranslatableText("droprate.show", ConfiguredKeepInventory.Config.configdroprate).formatted(Formatting.AQUA), false);
-        entity.sendMessage(new TranslatableText("start.read.itemsaved").formatted(Formatting.AQUA), false);
+        ctx.getSource().sendFeedback(new LiteralText("showing config values").formatted(Formatting.GREEN), false);
+        entity.sendMessage(new LiteralText("the config droprate is currently set to " + ConfiguredKeepInventory.Config.configdroprate).formatted(Formatting.AQUA), false);
+        entity.sendMessage(new LiteralText("starting to read the items save list...").formatted(Formatting.AQUA), false);
         for (String item : config.itemsSavedList){
             entity.sendMessage(new LiteralText(item).formatted(Formatting.AQUA), false);
         }
-        entity.sendMessage(new TranslatableText("start.read.namessaved"), false);
+        entity.sendMessage(new LiteralText("starting to read the names save list...").formatted(Formatting.AQUA), false);
         for (String name : config.namesSavedList){
             entity.sendMessage(new LiteralText(name).formatted(Formatting.AQUA), false);
         }
@@ -118,7 +117,7 @@ public class InventoryCommand
                 throw new IllegalStateException("Unexpected value: " + enchant);
         }
         ConfiguredKeepInventory.manager.save();
-        ctx.getSource().getPlayer().sendMessage(new TranslatableText("enchant.enable", enchant), false);
+        ctx.getSource().getPlayer().sendMessage(new LiteralText("disabled the effects of the " + enchant + " curse").formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeEnchantDisable(String enchant, CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
@@ -134,7 +133,7 @@ public class InventoryCommand
                 throw new IllegalStateException("Unexpected value: " + enchant);
         }
         ConfiguredKeepInventory.manager.save();
-        ctx.getSource().getPlayer().sendMessage(new TranslatableText("enchant.disable", enchant), false);
+        ctx.getSource().getPlayer().sendMessage(new LiteralText("reenabled the effects of the " + enchant + " curse").formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeSummary(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
@@ -176,11 +175,11 @@ public class InventoryCommand
     public static void remove(String string, CommandContext<ServerCommandSource> ctx, boolean itemorname){
         if (itemorname){
             ConfiguredKeepInventory.Config.itemsSavedList.remove(string);
-            ctx.getSource().sendFeedback(new TranslatableText("removed.item"), true);
+            ctx.getSource().sendFeedback(new LiteralText("removed item " + string + " from the item save list"), true);
         }
         else{
             ConfiguredKeepInventory.Config.namesSavedList.remove(string);
-            ctx.getSource().sendFeedback(new TranslatableText("removed.name"), true);
+            ctx.getSource().sendFeedback(new LiteralText("removed name " + string + " from the item save list"), true);
         }
         ConfiguredKeepInventory.manager.save();
     }
@@ -189,19 +188,19 @@ public class InventoryCommand
         if (itemOrName ){
             if (!ConfiguredKeepInventory.Config.itemsSavedList.contains(string)){
                 ConfiguredKeepInventory.Config.itemsSavedList.add(string);
-                ctx.getSource().sendFeedback(new TranslatableText("added.item", string), true);
+                ctx.getSource().sendFeedback(new LiteralText("added item " + string + " to the item save list"), true);
             }
             else{
-                ctx.getSource().sendFeedback(new TranslatableText("added.item.fail").formatted(Formatting.RED), false);
+                ctx.getSource().sendFeedback(new LiteralText("the item list already contains said item!").formatted(Formatting.RED), false);
             }
         }
         else{
             if (!ConfiguredKeepInventory.Config.namesSavedList.contains(string)){
                 ConfiguredKeepInventory.Config.namesSavedList.add(string);
-                ctx.getSource().sendFeedback(new TranslatableText("added.name", string), true);
+                ctx.getSource().sendFeedback(new LiteralText("added name " + string + " to the name save list"), true);
             }
             else{
-                ctx.getSource().sendFeedback(new TranslatableText("added.name.fail", string).formatted(Formatting.RED), false);
+                ctx.getSource().sendFeedback(new LiteralText("the name list already contains said name!").formatted(Formatting.RED), false);
             }
         }
         ConfiguredKeepInventory.manager.save();
