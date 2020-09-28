@@ -9,10 +9,11 @@
   ],
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/get-off-my-lawn",
-    "sources": "https://github.com/OverlordsIII/ConfiguredKeepInventory"
+    "sources": "https://github.com/OverlordsIII/ConfiguredKeepInventory",
+    "issues": "https://github.com/OverlordsIII/ConfiguredKeepInventory/issues"
   },
   "license": "MIT",
-  "icon": "assets/kingdomcraft/icon.png",
+  "icon": "assets/inventoryconfig/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
