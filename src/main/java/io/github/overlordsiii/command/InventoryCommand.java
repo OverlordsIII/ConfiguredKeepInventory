@@ -6,6 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.config.InventoryConfig;
+import me.sargunvohra.mcmods.autoconfig1u.ConfigManager;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.item.Item;
 import net.minecraft.server.command.ServerCommandSource;
@@ -23,11 +24,12 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 
 public class InventoryCommand {
-
+    static InventoryConfig config = ConfiguredKeepInventory.Config;
+    static ConfigManager manager = ConfiguredKeepInventory.manager;
     //TODO redo the Translatable text cuz lang wasnt working
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher){
         dispatcher.register(literal("inventory")
-            .requires(source -> ConfiguredKeepInventory.Config.needsOP ? source.hasPermissionLevel(2) : source.hasPermissionLevel(0))
+            .requires(source -> config.needsOP ? source.hasPermissionLevel(2) : source.hasPermissionLevel(0))
                 .then(literal("set")
                     .then(argument("percentage", integer(0, 100))
                         .executes(ctx -> execute(ctx, getInteger(ctx, "percentage")))))
@@ -65,21 +67,21 @@ public class InventoryCommand {
                         .executes(context -> executeEnchantDisable("binding", context))));
     }
     public static int execute(CommandContext<ServerCommandSource> ctx, int value) {
-        ConfiguredKeepInventory.Config.configdroprate = value;
-        ConfiguredKeepInventory.manager.save();
+        config.configdroprate = value;
+        manager.save();
       //  ctx.getSource().sendFeedback(new TranslatableText("inventory.set", value), true);
         ctx.getSource().sendFeedback(new LiteralText("set the inventory droprate to " + value + " percent").formatted(Formatting.AQUA), true);
         return 1;
     }
     public static int executeOn(CommandContext<ServerCommandSource> ctx, boolean onoroff){
         if (onoroff){
-            ConfiguredKeepInventory.Config.enableConfig = true;
-            ConfiguredKeepInventory.manager.save();
+            config.enableConfig = true;
+            manager.save();
             ctx.getSource().sendFeedback(new LiteralText("the config has been turned on").formatted(Formatting.GREEN), true);
         }
         else{
-            ConfiguredKeepInventory.Config.enableConfig = false;
-            ConfiguredKeepInventory.manager.save();
+            config.enableConfig = false;
+            manager.save();
             ctx.getSource().sendFeedback(new LiteralText("the config has been turned off").formatted(Formatting.RED), true);
         }
        // ctx.getSource().sendFeedback(new TranslatableText("config.on").formatted(Formatting.GREEN), true);
@@ -88,9 +90,8 @@ public class InventoryCommand {
     }
     public static int executeGet(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         ServerPlayerEntity entity = ctx.getSource().getPlayer();
-        InventoryConfig config = ConfiguredKeepInventory.Config;
         ctx.getSource().sendFeedback(new LiteralText("showing config values").formatted(Formatting.GREEN), false);
-        entity.sendMessage(new LiteralText("the config droprate is currently set to " + ConfiguredKeepInventory.Config.configdroprate).formatted(Formatting.AQUA), false);
+        entity.sendMessage(new LiteralText("the config droprate is currently set to " + config.configdroprate).formatted(Formatting.AQUA), false);
         entity.sendMessage(new LiteralText("starting to read the items save list...").formatted(Formatting.AQUA), false);
         for (String item : config.itemsSavedList){
             entity.sendMessage(new LiteralText(item).formatted(Formatting.AQUA), false);
@@ -107,32 +108,32 @@ public class InventoryCommand {
 
         switch (enchant){
             case "vanishing":
-                ConfiguredKeepInventory.Config.disableVanishingCurse = true;
+                config.disableVanishingCurse = false;
 
             case "binding":
-                ConfiguredKeepInventory.Config.disableBindingCurse = true;
+                config.disableBindingCurse = false;
 
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + enchant);
         }
-        ConfiguredKeepInventory.manager.save();
+        manager.save();
         ctx.getSource().getPlayer().sendMessage(new LiteralText("disabled the effects of the " + enchant + " curse").formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeEnchantDisable(String enchant, CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         switch (enchant){
             case "vanishing":
-                ConfiguredKeepInventory.Config.disableVanishingCurse = false;
+                config.disableVanishingCurse = true;
 
             case "binding":
-                ConfiguredKeepInventory.Config.disableBindingCurse = false;
+                config.disableBindingCurse = true;
 
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + enchant);
         }
-        ConfiguredKeepInventory.manager.save();
+        manager.save();
         ctx.getSource().getPlayer().sendMessage(new LiteralText("reenabled the effects of the " + enchant + " curse").formatted(Formatting.AQUA), false);
         return 1;
     }
@@ -148,8 +149,10 @@ public class InventoryCommand {
         player.sendMessage(new LiteralText("/inventory add name (name) - adds an name to the name save list. If an item has a custom name and the name of the item is on the list, that item will be saved and never drop"), false);
         player.sendMessage(new LiteralText("/inventory remove item (item) - removes an item from the item save list"), false);
         player.sendMessage(new LiteralText("/inventory remove name (name) - removes an item from the name save list"), false);
-        player.sendMessage(new LiteralText("/inventory enable vanishing - makes the vanishing curse ineffective and now they drop like normal"), false);
-        player.sendMessage(new LiteralText("/inventory enable binding - makes the binding curse ineffective and now items can move around the inventory freely"), false);
+        player.sendMessage(new LiteralText("/inventory disable vanishing - makes the vanishing curse ineffective and now they drop like normal"), false);
+        player.sendMessage(new LiteralText("/inventory disable binding - makes the binding curse ineffective and now items can move around the inventory freely"), false);
+        player.sendMessage(new LiteralText("/inventory enable binding - turns binding back on"), false);
+        player.sendMessage(new LiteralText("/inventory enable vanishing - turns vanishing back on"), false);
         player.sendMessage(new LiteralText("/inventory help  - also displays this message"), false);
         player.sendMessage(new LiteralText("------------------------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
         player.sendMessage(new LiteralText("Issues ? : https://github.com/OverlordsIII/ConfiguredKeepInventory/issues"), false);
@@ -174,20 +177,20 @@ public class InventoryCommand {
     }
     public static void remove(String string, CommandContext<ServerCommandSource> ctx, boolean itemorname){
         if (itemorname){
-            ConfiguredKeepInventory.Config.itemsSavedList.remove(string);
+            config.itemsSavedList.remove(string);
             ctx.getSource().sendFeedback(new LiteralText("removed item " + string + " from the item save list"), true);
         }
         else{
-            ConfiguredKeepInventory.Config.namesSavedList.remove(string);
+            config.namesSavedList.remove(string);
             ctx.getSource().sendFeedback(new LiteralText("removed name " + string + " from the item save list"), true);
         }
-        ConfiguredKeepInventory.manager.save();
+        manager.save();
     }
 
     public static void add(String string, CommandContext<ServerCommandSource> ctx, boolean itemOrName){
         if (itemOrName ){
-            if (!ConfiguredKeepInventory.Config.itemsSavedList.contains(string)){
-                ConfiguredKeepInventory.Config.itemsSavedList.add(string);
+            if (!config.itemsSavedList.contains(string)){
+                config.itemsSavedList.add(string);
                 ctx.getSource().sendFeedback(new LiteralText("added item " + string + " to the item save list"), true);
             }
             else{
@@ -195,15 +198,15 @@ public class InventoryCommand {
             }
         }
         else{
-            if (!ConfiguredKeepInventory.Config.namesSavedList.contains(string)){
-                ConfiguredKeepInventory.Config.namesSavedList.add(string);
+            if (!config.namesSavedList.contains(string)){
+                config.namesSavedList.add(string);
                 ctx.getSource().sendFeedback(new LiteralText("added name " + string + " to the name save list"), true);
             }
             else{
                 ctx.getSource().sendFeedback(new LiteralText("the name list already contains said name!").formatted(Formatting.RED), false);
             }
         }
-        ConfiguredKeepInventory.manager.save();
+        manager.save();
     }
 
 
