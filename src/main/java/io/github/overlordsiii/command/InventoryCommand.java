@@ -20,12 +20,14 @@ import static com.mojang.brigadier.arguments.IntegerArgumentType.integer;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+;
+
 
 
 
 public class InventoryCommand {
-    static InventoryConfig config = ConfiguredKeepInventory.Config;
-    static ConfigManager manager = ConfiguredKeepInventory.manager;
+    private static InventoryConfig config = ConfiguredKeepInventory.Config;
+    private static ConfigManager manager = ConfiguredKeepInventory.manager;
     //TODO redo the Translatable text cuz lang wasnt working
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher){
         dispatcher.register(literal("inventory")
@@ -55,53 +57,44 @@ public class InventoryCommand {
                             .executes(context -> executeRemoveName(context, StringArgumentType.getString(context, "name"))))))
                 .then(literal("enable")
                     .then(literal("vanishing")
-                        .executes(context -> executeEnchantEnable("vanishing", context))))
+                            .executes(context -> executeEnchantEnable("vanishing", context)))
                     .then(literal("binding")
-                        .executes(context -> executeEnchantEnable("binding", context)))
+                            .executes(context -> executeEnchantEnable("binding", context))))
                 .then(literal("help")
                     .executes(InventoryCommand::executeSummary))
                 .then(literal("disable")
                     .then(literal("vanishing")
-                        .executes(context -> executeEnchantDisable("vanishing", context))))
+                            .executes(context -> executeEnchantDisable("vanishing", context)))
                     .then(literal("binding")
-                        .executes(context -> executeEnchantDisable("binding", context))));
+                            .executes(context -> executeEnchantDisable("binding", context)))));
     }
     public static int execute(CommandContext<ServerCommandSource> ctx, int value) {
         config.configdroprate = value;
         manager.save();
-      //  ctx.getSource().sendFeedback(new TranslatableText("inventory.set", value), true);
-        ctx.getSource().sendFeedback(new LiteralText("set the inventory droprate to " + value + " percent").formatted(Formatting.AQUA), true);
+        ctx.getSource().sendFeedback(new TranslatableText("inventory.set", value), true);
+      //  ctx.getSource().sendFeedback(new LiteralText("set the inventory droprate to " + value + " percent").formatted(Formatting.AQUA), true);
         return 1;
     }
-    public static int executeOn(CommandContext<ServerCommandSource> ctx, boolean onoroff){
-        if (onoroff){
-            config.enableConfig = true;
+    public static int executeOn(CommandContext<ServerCommandSource> ctx, boolean onoroff) throws CommandSyntaxException {
+            config.enableConfig = onoroff;
             manager.save();
-            ctx.getSource().sendFeedback(new LiteralText("the config has been turned on").formatted(Formatting.GREEN), true);
-        }
-        else{
-            config.enableConfig = false;
-            manager.save();
-            ctx.getSource().sendFeedback(new LiteralText("the config has been turned off").formatted(Formatting.RED), true);
-        }
-       // ctx.getSource().sendFeedback(new TranslatableText("config.on").formatted(Formatting.GREEN), true);
-
+        ctx.getSource().sendFeedback(new TranslatableText("config.on", config.enableConfig).formatted(Formatting.GREEN), true);
         return 1;
     }
     public static int executeGet(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         ServerPlayerEntity entity = ctx.getSource().getPlayer();
-        ctx.getSource().sendFeedback(new LiteralText("showing config values").formatted(Formatting.GREEN), false);
-        entity.sendMessage(new LiteralText("the config droprate is currently set to " + config.configdroprate).formatted(Formatting.AQUA), false);
-        entity.sendMessage(new LiteralText("starting to read the items save list...").formatted(Formatting.AQUA), false);
+        ctx.getSource().sendFeedback(new TranslatableText("config.show").formatted(Formatting.GREEN), false);
+        entity.sendMessage(new TranslatableText("config.isSet", config.configdroprate).formatted(Formatting.AQUA), false);
+        entity.sendMessage(new TranslatableText("itemsavelist.read").formatted(Formatting.AQUA), false);
         for (String item : config.itemsSavedList){
             entity.sendMessage(new LiteralText(item).formatted(Formatting.AQUA), false);
         }
-        entity.sendMessage(new LiteralText("starting to read the names save list...").formatted(Formatting.AQUA), false);
+        entity.sendMessage(new TranslatableText("namesavelist.read").formatted(Formatting.AQUA), false);
         for (String name : config.namesSavedList){
             entity.sendMessage(new LiteralText(name).formatted(Formatting.AQUA), false);
         }
-        entity.sendMessage(new TranslatableText("vanishingenabled.show", config.disableVanishingCurse).formatted(Formatting.AQUA), false);
-        entity.sendMessage(new TranslatableText("bindingdisabled.show", config.disableBindingCurse).formatted(Formatting.AQUA), false);
+        entity.sendMessage(new TranslatableText("vanish.current", !config.disableVanishingCurse).formatted(Formatting.AQUA), false);
+        entity.sendMessage(new TranslatableText("binding.current", !config.disableBindingCurse).formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeEnchantEnable(String enchant, CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
@@ -118,7 +111,7 @@ public class InventoryCommand {
                 throw new IllegalStateException("Unexpected value: " + enchant);
         }
         manager.save();
-        ctx.getSource().getPlayer().sendMessage(new LiteralText("disabled the effects of the " + enchant + " curse").formatted(Formatting.AQUA), false);
+        ctx.getSource().getPlayer().sendMessage(new TranslatableText("enchant.disable", enchant).formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeEnchantDisable(String enchant, CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
@@ -134,27 +127,28 @@ public class InventoryCommand {
                 throw new IllegalStateException("Unexpected value: " + enchant);
         }
         manager.save();
-        ctx.getSource().getPlayer().sendMessage(new LiteralText("reenabled the effects of the " + enchant + " curse").formatted(Formatting.AQUA), false);
+        ctx.getSource().getPlayer().sendMessage(new TranslatableText("enchant.enable", enchant).formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeSummary(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        player.sendMessage(new LiteralText("----------------------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
+        //TODO translateable
+        player.sendMessage(new LiteralText("-------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
         player.sendMessage(new LiteralText("                           Configured Inventory's Summary/Help"), false);
-        player.sendMessage(new LiteralText("/inventory set (integer) - sets the inventory droprate (Sets the config value of \"configdroprate\"."), false);
-        player.sendMessage(new LiteralText("/inventory on/off - turns the mod on and off. Requires a restart to fully take effect (Sets the config value of \"enableconfig\")"), false);
+        player.sendMessage(new LiteralText("/inventory set (integer) - sets the inventory droprate "), false);
+        player.sendMessage(new LiteralText("/inventory on/off - turns the mod on and off"), false);
         player.sendMessage(new LiteralText("/inventory get info - sends all the info about the config values of the mod back to the player"), false);
         player.sendMessage(new LiteralText("/inventory get summary - sends this message to the player"), false);
-        player.sendMessage(new LiteralText("/inventory add item (item) - adds an item to the item save list. Makes it so the item will be saved no matter the config droprate"), false);
-        player.sendMessage(new LiteralText("/inventory add name (name) - adds an name to the name save list. If an item has a custom name and the name of the item is on the list, that item will be saved and never drop"), false);
+        player.sendMessage(new LiteralText("/inventory add item (item) - adds an item to the item save list."), false);
+        player.sendMessage(new LiteralText("/inventory add name (name) - adds an name to the name save list. "), false);
         player.sendMessage(new LiteralText("/inventory remove item (item) - removes an item from the item save list"), false);
         player.sendMessage(new LiteralText("/inventory remove name (name) - removes an item from the name save list"), false);
         player.sendMessage(new LiteralText("/inventory disable vanishing - makes the vanishing curse ineffective and now they drop like normal"), false);
-        player.sendMessage(new LiteralText("/inventory disable binding - makes the binding curse ineffective and now items can move around the inventory freely"), false);
+        player.sendMessage(new LiteralText("/inventory disable binding - makes the binding curse ineffective"), false);
         player.sendMessage(new LiteralText("/inventory enable binding - turns binding back on"), false);
         player.sendMessage(new LiteralText("/inventory enable vanishing - turns vanishing back on"), false);
         player.sendMessage(new LiteralText("/inventory help  - also displays this message"), false);
-        player.sendMessage(new LiteralText("------------------------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
+        player.sendMessage(new LiteralText("--------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
         player.sendMessage(new LiteralText("Issues ? : https://github.com/OverlordsIII/ConfiguredKeepInventory/issues"), false);
             return 1;
     }
@@ -178,11 +172,11 @@ public class InventoryCommand {
     public static void remove(String string, CommandContext<ServerCommandSource> ctx, boolean itemorname){
         if (itemorname){
             config.itemsSavedList.remove(string);
-            ctx.getSource().sendFeedback(new LiteralText("removed item " + string + " from the item save list"), true);
+            ctx.getSource().sendFeedback(new TranslatableText("removed.item", string), true);
         }
         else{
             config.namesSavedList.remove(string);
-            ctx.getSource().sendFeedback(new LiteralText("removed name " + string + " from the item save list"), true);
+            ctx.getSource().sendFeedback(new TranslatableText("removed.name", string), true);
         }
         manager.save();
     }
@@ -191,19 +185,19 @@ public class InventoryCommand {
         if (itemOrName ){
             if (!config.itemsSavedList.contains(string)){
                 config.itemsSavedList.add(string);
-                ctx.getSource().sendFeedback(new LiteralText("added item " + string + " to the item save list"), true);
+                ctx.getSource().sendFeedback(new TranslatableText("added.item", string), true);
             }
             else{
-                ctx.getSource().sendFeedback(new LiteralText("the item list already contains said item!").formatted(Formatting.RED), false);
+                ctx.getSource().sendFeedback(new TranslatableText("add.error.item").formatted(Formatting.RED), false);
             }
         }
         else{
             if (!config.namesSavedList.contains(string)){
                 config.namesSavedList.add(string);
-                ctx.getSource().sendFeedback(new LiteralText("added name " + string + " to the name save list"), true);
+                ctx.getSource().sendFeedback(new TranslatableText("add.name", string), true);
             }
             else{
-                ctx.getSource().sendFeedback(new LiteralText("the name list already contains said name!").formatted(Formatting.RED), false);
+                ctx.getSource().sendFeedback(new TranslatableText("add.name.error").formatted(Formatting.RED), false);
             }
         }
         manager.save();

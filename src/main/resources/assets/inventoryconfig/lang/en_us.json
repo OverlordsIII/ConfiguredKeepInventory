@@ -1,4 +1,18 @@
 {
   "droprate.show": "The Current inventory droprate is set to %d",
-  "inventory.set": "Set the inventory droprate to %d"
+  "inventory.set": "Set the inventory droprate to %d",
+  "config.show": "Currently showing the inventory config...",
+  "config.isSet": "Config droprate set to %d percent",
+  "itemsavelist.read": "Reading items from the item save list...",
+  "namesavelist.read": "Reading names from the name save list...",
+  "vanish.current": "Vanishing curse is currently %s",
+  "binding.current": "Binding Curse is currently %s",
+  "enchant.disable": "Disabled the %s curse",
+  "enchant.enable": "Reenabled the %s curse",
+  "removed.name": "Removed the %s name from the name save list",
+  "removed.item": "Removed the %s item from the item save list",
+  "added.item": "Added the %s item to the item save list",
+  "add.error.item": "The Item save list already has that item!",
+  "add.name": "Added the %s name to the name save list",
+  "add.error.name": "The Name save list already has that name!"
 }

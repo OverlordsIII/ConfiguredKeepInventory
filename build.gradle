@@ -17,6 +17,9 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
+    //resource loader from fabric api
+    modImplementation(fabricApi.module('fabric-resource-loader-v0', project.fabric_version))
+
     //config
     modApi("me.sargunvohra.mcmods:autoconfig1u:3.2.2") {
         exclude(group: "net.fabricmc.fabric-api")

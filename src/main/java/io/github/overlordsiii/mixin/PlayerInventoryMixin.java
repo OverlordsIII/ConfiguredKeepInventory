@@ -1,9 +1,8 @@
 package io.github.overlordsiii.mixin;
 
 
-
 import io.github.overlordsiii.ConfiguredKeepInventory;
-import io.github.overlordsiii.mixinterfaces.PlayerInventoryDuck;
+import io.github.overlordsiii.mixinterfaces.PlayerInventoryExt;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -22,14 +21,23 @@ import java.util.Iterator;
 import java.util.List;
 
 @Mixin(PlayerInventory.class)
-public abstract class PlayerInventoryMixin implements PlayerInventoryDuck {
+public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
 
+//    public Item[] autosortItems = new Item[]{Objects.requireNonNull(this.player.world.getServer()).isHardcore() ? Items.TOTEM_OF_UNDYING : Items.GOLDEN_CARROT, };
 
     @Shadow @Final private List<DefaultedList<ItemStack>> combinedInventory;
 
     @Shadow @Final public PlayerEntity player;
 
     @Shadow @Final public DefaultedList<ItemStack> offHand;
+
+    @Shadow public abstract ItemStack getStack(int slot);
+
+    @Shadow public abstract void setStack(int slot, ItemStack stack);
+
+    @Shadow @Final public DefaultedList<ItemStack> main;
+
+    @Shadow @Final public DefaultedList<ItemStack> armor;
 
     @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z"))
     private boolean droredirect(Iterator iterator){
@@ -78,14 +86,77 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryDuck {
     }
     }
 
+    //coming soon
+    /**
+     * A method that sorts your offhand based on the stack, or a pregenerated list
+     * @param stack that you want sorted. Input null to auto sort
+     */
+
+
     @Override
     public void sortOffHand(ItemStack stack) {
 
+            if (stack != null){
+                if (this.indexOf(stack) != -1){
+                    int item = indexOf(stack);
+                   ItemStack currentOffStack = this.offHand.get(0);
+                   ItemStack wantedStack = this.main.get(item);
+                   this.main.set(item, currentOffStack);
+                   this.offHand.set(0, wantedStack);
+                }
+                else{
+                   int slot = this.indexOfArmor(stack);
+                   ItemStack currentOffHandStack = this.offHand.get(0);
+                   ItemStack wantedStack = this.armor.get(slot);
+                   this.armor.set(slot, currentOffHandStack);
+                   this.offHand.set(0, wantedStack);
+                }
+            }
         }
 
+
+
     @Override
+
     public void sortHotBar(DefaultedList<ItemStack> stack) {
 
     }
+
+    /**
+     *  this only searches on the main inventory
+     * @param stack wanted stack
+     * @return index of stack in the main slot
+     */
+
+    @Override
+
+    public int indexOf(ItemStack stack) {
+        for (int i = 0; i < this.main.size(); i++){
+            ItemStack itemStack = this.main.get(i);
+            if (itemStack.isItemEqual(stack)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * only searches armor inventory
+     * @param stack wanted stack
+     * @return index of the stack in armor slots
+    */
+
+    @Override
+    public int indexOfArmor(ItemStack stack){
+        for (int i = 0; i < this.armor.size(); i++){
+            ItemStack stacker = this.armor.get(i);
+            if (stacker.isItemEqual(stack)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
 }
 
