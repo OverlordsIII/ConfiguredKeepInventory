@@ -23,27 +23,26 @@ import java.util.List;
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
 
-//    public Item[] autosortItems = new Item[]{Objects.requireNonNull(this.player.world.getServer()).isHardcore() ? Items.TOTEM_OF_UNDYING : Items.GOLDEN_CARROT, };
-
-    @Shadow @Final private List<DefaultedList<ItemStack>> combinedInventory;
-
+    public int cycle = 0;
     @Shadow @Final public PlayerEntity player;
 
     @Shadow @Final public DefaultedList<ItemStack> offHand;
 
-    @Shadow public abstract ItemStack getStack(int slot);
-
-    @Shadow public abstract void setStack(int slot, ItemStack stack);
 
     @Shadow @Final public DefaultedList<ItemStack> main;
 
     @Shadow @Final public DefaultedList<ItemStack> armor;
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void constructList(PlayerEntity player, CallbackInfo ci){
 
+    }
     @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z"))
     private boolean droredirect(Iterator iterator){
         //redirect for vanilla behavior
         return iterator.hasNext() && !ConfiguredKeepInventory.Config.enableConfig;
     }
+
+
     @Inject(method = "dropAll", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void capture(CallbackInfo ci, Iterator<List<ItemStack>> var1){
         //ad custom behavior if mod is enabled
@@ -88,14 +87,13 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
 
     //coming soon
     /**
-     * A method that sorts your offhand based on the stack, or a pregenerated list
-     * @param stack that you want sorted. Input null to auto sort
+     * A method that sorts your offhand based on the stack.
+     * @param stack that you want sorted
      */
 
 
     @Override
     public void sortOffHand(ItemStack stack) {
-
             if (stack != null){
                 if (this.indexOf(stack) != -1){
                     int item = indexOf(stack);
@@ -114,7 +112,13 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
             }
         }
 
+    /**
+     * a method that searches through a pregenerated list based on the cycle num
+     */
+    @Override
+    public void sortOffHand() {
 
+    }
 
     @Override
 

@@ -12,7 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 import static com.mojang.brigadier.arguments.IntegerArgumentType.getInteger;
@@ -71,30 +70,30 @@ public class InventoryCommand {
     public static int execute(CommandContext<ServerCommandSource> ctx, int value) {
         config.configdroprate = value;
         manager.save();
-        ctx.getSource().sendFeedback(new TranslatableText("inventory.set", value), true);
+        ctx.getSource().sendFeedback(new LiteralText("Current inventory droprate is " + value+ " percent"), true);
       //  ctx.getSource().sendFeedback(new LiteralText("set the inventory droprate to " + value + " percent").formatted(Formatting.AQUA), true);
         return 1;
     }
     public static int executeOn(CommandContext<ServerCommandSource> ctx, boolean onoroff) throws CommandSyntaxException {
             config.enableConfig = onoroff;
             manager.save();
-        ctx.getSource().sendFeedback(new TranslatableText("config.on", config.enableConfig).formatted(Formatting.GREEN), true);
+        ctx.getSource().sendFeedback(new LiteralText("The config is currently set to " + onoroff).formatted(Formatting.GREEN), true);
         return 1;
     }
     public static int executeGet(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         ServerPlayerEntity entity = ctx.getSource().getPlayer();
-        ctx.getSource().sendFeedback(new TranslatableText("config.show").formatted(Formatting.GREEN), false);
-        entity.sendMessage(new TranslatableText("config.isSet", config.configdroprate).formatted(Formatting.AQUA), false);
-        entity.sendMessage(new TranslatableText("itemsavelist.read").formatted(Formatting.AQUA), false);
+        ctx.getSource().sendFeedback(new LiteralText("Showing Config Values...").formatted(Formatting.GREEN), false);
+        entity.sendMessage(new LiteralText("Config Droprate  = " + config.configdroprate).formatted(Formatting.AQUA), false);
+        entity.sendMessage(new LiteralText("Reading the item save list...").formatted(Formatting.AQUA), false);
         for (String item : config.itemsSavedList){
             entity.sendMessage(new LiteralText(item).formatted(Formatting.AQUA), false);
         }
-        entity.sendMessage(new TranslatableText("namesavelist.read").formatted(Formatting.AQUA), false);
+        entity.sendMessage(new LiteralText("Reading the name save list...").formatted(Formatting.AQUA), false);
         for (String name : config.namesSavedList){
             entity.sendMessage(new LiteralText(name).formatted(Formatting.AQUA), false);
         }
-        entity.sendMessage(new TranslatableText("vanish.current", !config.disableVanishingCurse).formatted(Formatting.AQUA), false);
-        entity.sendMessage(new TranslatableText("binding.current", !config.disableBindingCurse).formatted(Formatting.AQUA), false);
+        entity.sendMessage(new LiteralText("Vanishing is currently " + !config.disableVanishingCurse).formatted(Formatting.AQUA), false);
+        entity.sendMessage(new LiteralText("Binding is currently " + !config.disableBindingCurse).formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeEnchantEnable(String enchant, CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
@@ -111,7 +110,7 @@ public class InventoryCommand {
                 throw new IllegalStateException("Unexpected value: " + enchant);
         }
         manager.save();
-        ctx.getSource().getPlayer().sendMessage(new TranslatableText("enchant.disable", enchant).formatted(Formatting.AQUA), false);
+        ctx.getSource().getPlayer().sendMessage(new LiteralText("Reenabled the " + enchant +" curse").formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeEnchantDisable(String enchant, CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
@@ -127,12 +126,11 @@ public class InventoryCommand {
                 throw new IllegalStateException("Unexpected value: " + enchant);
         }
         manager.save();
-        ctx.getSource().getPlayer().sendMessage(new TranslatableText("enchant.enable", enchant).formatted(Formatting.AQUA), false);
+        ctx.getSource().getPlayer().sendMessage(new LiteralText("Disabled the " + enchant + " curse").formatted(Formatting.AQUA), false);
         return 1;
     }
     public static int executeSummary(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        //TODO translateable
         player.sendMessage(new LiteralText("-------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
         player.sendMessage(new LiteralText("                           Configured Inventory's Summary/Help"), false);
         player.sendMessage(new LiteralText("/inventory set (integer) - sets the inventory droprate "), false);
@@ -172,11 +170,11 @@ public class InventoryCommand {
     public static void remove(String string, CommandContext<ServerCommandSource> ctx, boolean itemorname){
         if (itemorname){
             config.itemsSavedList.remove(string);
-            ctx.getSource().sendFeedback(new TranslatableText("removed.item", string), true);
+            ctx.getSource().sendFeedback(new LiteralText("Removed the " + string + " item from the item save list"), true);
         }
         else{
             config.namesSavedList.remove(string);
-            ctx.getSource().sendFeedback(new TranslatableText("removed.name", string), true);
+            ctx.getSource().sendFeedback(new LiteralText("Removed the " + string + " name from the name save list"), true);
         }
         manager.save();
     }
@@ -185,19 +183,19 @@ public class InventoryCommand {
         if (itemOrName ){
             if (!config.itemsSavedList.contains(string)){
                 config.itemsSavedList.add(string);
-                ctx.getSource().sendFeedback(new TranslatableText("added.item", string), true);
+                ctx.getSource().sendFeedback(new LiteralText("Added the " + string + " item to the item save list"), true);
             }
             else{
-                ctx.getSource().sendFeedback(new TranslatableText("add.error.item").formatted(Formatting.RED), false);
+                ctx.getSource().sendFeedback(new LiteralText("The " + string + " item is already in the item save list").formatted(Formatting.RED), false);
             }
         }
         else{
             if (!config.namesSavedList.contains(string)){
                 config.namesSavedList.add(string);
-                ctx.getSource().sendFeedback(new TranslatableText("add.name", string), true);
+                ctx.getSource().sendFeedback(new LiteralText("Added the name " + string + " to the name save list"), true);
             }
             else{
-                ctx.getSource().sendFeedback(new TranslatableText("add.name.error").formatted(Formatting.RED), false);
+                ctx.getSource().sendFeedback(new LiteralText("The name " + string + " is already in the name save list").formatted(Formatting.RED), false);
             }
         }
         manager.save();

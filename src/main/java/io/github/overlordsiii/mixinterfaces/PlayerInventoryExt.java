@@ -9,4 +9,5 @@ public interface PlayerInventoryExt {
     void sortHotBar(DefaultedList<ItemStack> stack);
     int indexOf(ItemStack stack);
     int indexOfArmor(ItemStack stack);
+    void sortOffHand();
 }

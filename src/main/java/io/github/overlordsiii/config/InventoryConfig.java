@@ -7,7 +7,7 @@ import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
 import java.util.ArrayList;
 import java.util.List;
 
-@Config(name = "inventoryconfig")
+@Config(name = "inventory")
 public class InventoryConfig implements ConfigData {
     @Comment("Effectively turns the mod on and off")
     public boolean enableConfig = true;
