@@ -46,45 +46,36 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     @Inject(method = "dropAll", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void capture(CallbackInfo ci, Iterator<List<ItemStack>> var1){
         //ad custom behavior if mod is enabled
-        if (var1.hasNext() && ConfiguredKeepInventory.Config.enableConfig){
-            //iterate to next inventory type
-            List<ItemStack> list = var1.next();
-            //iterate over whole inventory
-            for(int i = 0; i < list.size(); ++i) {
-                ItemStack stack = list.get(i);
-                //if stack is not empty
-                if (!stack.isEmpty()) {
-                 //   System.out.println(stack);
-                    //find the percent for which we need to multiply
-                    double percent = ConfiguredKeepInventory.Config.configdroprate / 100.0;
-                //    System.out.println("decimal percent = " + percent + " percent = " + ConfiguredKeepInventory.Config.configdroprate);
-                    //get the stack count
-                    double newStackCount = (percent * stack.getCount());
-                //    System.out.println("new stack Count = " + newStackCount + " old stack count = " + stack.getCount());
-                    //if the stack has vanishing then drop it and stop further processing on this loop
-                    if (EnchantmentHelper.hasVanishingCurse(stack)) {
-                        list.set(i, ItemStack.EMPTY);
-                    }
-                    //if the stack isnt in the names and items save list
-                    else if (!ConfiguredKeepInventory.Config.namesSavedList.contains(stack.getName().asString()) && !ConfiguredKeepInventory.Config.itemsSavedList.contains(stack.getItem().toString())){
-                        //decrement the original stack by the droprate found in the config
-                        stack.decrement(((int) Math.round(newStackCount)));
-                      //  System.out.println("stack count after decrement = " + stack.getCount());
-                        //create a copy stack to house the items we want to drop
-                        //set the copy stack count to the amount we decremented above
-                        ItemStack copyStack = new ItemStack(stack.getItem(), (int) Math.round(newStackCount));
-                  //      System.out.println("copy stack = " + copyStack);
-                        //drop the copystack at the right spot
-                        this.player.dropItem(copyStack, true);
-                        //validate that the inventory has recived the decrement changes to it
-                        list.set(i, stack);
-
-                    }
+        if (ConfiguredKeepInventory.Config.enableConfig){
+                    this.configureDrop(this.main);
+                    this.configureDrop(this.armor);
+                    this.configureDrop(this.offHand);
                 }
         }
-    }
-    }
 
+
+    @Override
+    public void configureDrop(DefaultedList<ItemStack> stacks) {
+        for (int i = 0; i < stacks.size(); i++){
+            ItemStack stack = stacks.get(i);
+            double percent = ConfiguredKeepInventory.Config.configdroprate / 100.0;
+            double newStackCount = (percent * stack.getCount());
+            if (EnchantmentHelper.hasVanishingCurse(stack)) {
+                stacks.set(i, ItemStack.EMPTY);
+            }
+            else if (stack.getCount() == 1){
+                if (ConfiguredKeepInventory.Config.configdroprate > 50){
+                    this.player.dropItem(stack, false);
+                }
+            }
+            else if (!ConfiguredKeepInventory.Config.namesSavedList.contains(stack.getName().asString()) && !ConfiguredKeepInventory.Config.itemsSavedList.contains(stack.getItem().toString())){
+                stack.decrement(((int) Math.round(newStackCount)));
+                ItemStack copyStack = new ItemStack(stack.getItem(), (int) Math.round(newStackCount));
+                this.player.dropItem(copyStack, false);
+                stacks.set(i, stack);
+            }
+        }
+    }
     //coming soon
     /**
      * A method that sorts your offhand based on the stack.

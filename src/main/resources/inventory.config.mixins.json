@@ -3,8 +3,9 @@
   "package": "io.github.overlordsiii.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "CommandManagerInject",
+    "CommandManagerMixin",
     "EnchantmentHelperMixin",
+    "PlayerEntityMixin",
     "PlayerInventoryMixin",
     "ServerPlayerEntityMixin"
   ],

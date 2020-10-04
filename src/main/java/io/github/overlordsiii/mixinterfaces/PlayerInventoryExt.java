@@ -10,4 +10,5 @@ public interface PlayerInventoryExt {
     int indexOf(ItemStack stack);
     int indexOfArmor(ItemStack stack);
     void sortOffHand();
+    void configureDrop(DefaultedList<ItemStack> stacks);
 }

@@ -25,4 +25,6 @@ public class InventoryConfig implements ConfigData {
     public boolean disableBindingCurse = false;
     @Comment("Makes sure you need op to do any of the inventory commands. Defaults to true. Requires a game restart to apply")
     public boolean needsOP = true;
+    @Comment("Specifies if the elytra mode is turned on. This means that the server will search your inventory and place rockets in your off hand while taking off and then put your original stack back in your hand when you land again")
+    public boolean elytraRockets = true;
 }
