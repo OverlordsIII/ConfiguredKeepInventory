@@ -66,6 +66,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
             else if (stack.getCount() == 1){
                 if (ConfiguredKeepInventory.Config.configdroprate > 50){
                     this.player.dropItem(stack, false);
+                    stacks.set(i, ItemStack.EMPTY);
                 }
             }
             else if (!ConfiguredKeepInventory.Config.namesSavedList.contains(stack.getName().asString()) && !ConfiguredKeepInventory.Config.itemsSavedList.contains(stack.getItem().toString())){

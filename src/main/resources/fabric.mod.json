@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "inventoryconfig",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "Configured Keep Inventory",
   "description": "A Server-Side mod that allows you to control how much items drop on death",
   "authors": [
