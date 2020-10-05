@@ -33,10 +33,6 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     @Shadow @Final public DefaultedList<ItemStack> main;
 
     @Shadow @Final public DefaultedList<ItemStack> armor;
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void constructList(PlayerEntity player, CallbackInfo ci){
-
-    }
     @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z"))
     private boolean droredirect(Iterator iterator){
         //redirect for vanilla behavior
@@ -54,7 +50,10 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
                 }
         }
 
-
+    /**
+     * method that sorts a specific inventory
+     * @param stacks the inventory that you want to sort
+     */
     @Override
     public void configureDrop(DefaultedList<ItemStack> stacks) {
         for (int i = 0; i < stacks.size(); i++) {
@@ -71,24 +70,25 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
                             stacks.set(i, ItemStack.EMPTY);
                         }
                     } else {
-                        System.out.println("New Stack Count = " + newStackCount);
-                        System.out.println("As int rounded down = " + (int)newStackCount);
-                        System.out.println("Stack = " + stack);
-                        System.out.println("Math round = " + Math.round(newStackCount));
-                        System.out.println("As int rounded up = " + (int) Math.round(newStackCount));
                         ItemStack copyStack;
+                        copyStack = stack.copy();
+                 //       System.out.println("processing stack  = " + stack);
+                 //       System.out.println("new stack count = " + newStackCount);
+                 //       System.out.println("Math Round = " + Math.round(newStackCount));
+                  //      System.out.println("as int rounded up = " + (int)Math.round(newStackCount));
+                  //      System.out.println("as int rounded down = " + (int)newStackCount);
+                  //      System.out.println("round up = " + ConfiguredKeepInventory.Config.roundUp);
                         if (ConfiguredKeepInventory.Config.roundUp) {
+                           copyStack.setCount((int)Math.round(newStackCount));
                             stack.decrement(((int) Math.round(newStackCount)));
-                            copyStack = new ItemStack(stack.getItem(), (int) Math.round(newStackCount));
                         }
                         else{
+                            copyStack.setCount((int)newStackCount);
                             stack.decrement((int)newStackCount);
-                            copyStack = new ItemStack(stack.getItem(), (int)newStackCount);
                         }
-                        System.out.println("Copy Stack = " + copyStack);
+                       // System.out.println("Copy Stack = " + copyStack);
                         ItemEntity entity = this.player.dropItem(copyStack, false);
                         System.out.println(entity);
-                      //  System.out.println("ItemEntitySpawned = " + this.player.dropItem(copyStack, false).createSpawnPacket());
                         stacks.set(i, stack);
                     }
                 }

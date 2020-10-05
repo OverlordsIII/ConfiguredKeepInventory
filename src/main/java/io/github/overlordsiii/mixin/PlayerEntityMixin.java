@@ -15,6 +15,7 @@ public abstract class PlayerEntityMixin {
     @Inject(method = "checkFallFlying", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;startFallFlying()V"))
     private void insert(CallbackInfoReturnable<Boolean> cir) {
         if (Config.elytraRockets) {
+
             ItemStack stack = this.inventory.offHand.get(0);
             if (!stack.getItem().equals(Items.FIREWORK_ROCKET)) {
                 int slot = ((PlayerInventoryExt) inventory).indexOf(new ItemStack(Items.FIREWORK_ROCKET));
@@ -25,6 +26,10 @@ public abstract class PlayerEntityMixin {
                     this.inventory.offHand.set(0, fireworks);
                 }
             }
+
+
+            setStack = this.inventory.offHand.get(0);
+            ((PlayerInventoryExt)this.inventory).sortOffHand(new ItemStack(Items.FIREWORK_ROCKET));
         }
     }
     @Inject(method = "checkFallFlying", at = @At("TAIL"))
@@ -46,6 +51,9 @@ public abstract class PlayerEntityMixin {
     }
 
 
+
  */
+
+
 
 }

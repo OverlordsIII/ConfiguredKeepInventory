@@ -74,7 +74,7 @@ public class InventoryCommand {
     public static int executeRound(CommandContext<ServerCommandSource> ctx, boolean trueOrFalse) throws CommandSyntaxException {
         config.roundUp = trueOrFalse;
         manager.save();
-        ctx.getSource().getPlayer().sendMessage(new LiteralText("Roundup Rule is now set to " + trueOrFalse), true);
+        ctx.getSource().sendFeedback(new LiteralText("Roundup Rule is now set to " + trueOrFalse), true);
         return 1;
     }
     public static int execute(CommandContext<ServerCommandSource> ctx, int value) {
