@@ -5,7 +5,6 @@ import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.command.InventoryCommand;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,7 +18,6 @@ public abstract class CommandManagerMixin {
     @Shadow
     private CommandDispatcher<ServerCommandSource> dispatcher;
 
-    @Shadow @Final private static Logger LOGGER;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void register(CommandManager.RegistrationEnvironment environment, CallbackInfo ci) {

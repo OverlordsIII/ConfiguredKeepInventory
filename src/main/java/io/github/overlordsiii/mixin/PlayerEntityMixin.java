@@ -7,8 +7,10 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin {
     //Coming soon
-    /*
-    @Shadow @Final public PlayerInventory inventory;
+/*
+    @Shadow
+    @Final
+    public PlayerInventory inventory;
     private ItemStack setStack;
     @Inject(method = "checkFallFlying", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;startFallFlying()V"))
     private void insert(CallbackInfoReturnable<Boolean> cir) {
@@ -29,7 +31,7 @@ public abstract class PlayerEntityMixin {
     private void reset(CallbackInfoReturnable<Boolean> cir){
         if (this.setStack != null && (((PlayerInventoryExt)inventory).indexOf(setStack) != -1 || setStack.isEmpty()) && Config.elytraRockets){
             int slot = ((PlayerInventoryExt)inventory).indexOf(setStack);
-            System.out.println("EHHLWLWLWLWLWLW");
+
             ItemStack stack = this.inventory.main.get(slot);
             ItemStack fireworks = this.inventory.offHand.get(0);
             if (!fireworks.isEmpty() && !stack.isEmpty()){
@@ -42,6 +44,8 @@ public abstract class PlayerEntityMixin {
             LOGGER.error("This is a problem with the mod");
         }
     }
-     */
+
+
+ */
 
 }

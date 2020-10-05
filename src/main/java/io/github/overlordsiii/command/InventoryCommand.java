@@ -1,6 +1,7 @@
 package io.github.overlordsiii.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -27,7 +28,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class InventoryCommand {
     private static InventoryConfig config = ConfiguredKeepInventory.Config;
     private static ConfigManager manager = ConfiguredKeepInventory.manager;
-    //TODO redo the Translatable text cuz lang wasnt working
+    //TODO make the system make sense
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher){
         dispatcher.register(literal("inventory")
             .requires(source -> config.needsOP ? source.hasPermissionLevel(2) : source.hasPermissionLevel(0))
@@ -65,7 +66,16 @@ public class InventoryCommand {
                     .then(literal("vanishing")
                             .executes(context -> executeEnchantDisable("vanishing", context)))
                     .then(literal("binding")
-                            .executes(context -> executeEnchantDisable("binding", context)))));
+                            .executes(context -> executeEnchantDisable("binding", context))))
+                .then(literal("roundUp")
+                    .then(argument("round", BoolArgumentType.bool())
+                        .executes(context -> executeRound(context, BoolArgumentType.getBool(context, "round"))))));
+    }
+    public static int executeRound(CommandContext<ServerCommandSource> ctx, boolean trueOrFalse) throws CommandSyntaxException {
+        config.roundUp = trueOrFalse;
+        manager.save();
+        ctx.getSource().getPlayer().sendMessage(new LiteralText("Roundup Rule is now set to " + trueOrFalse), true);
+        return 1;
     }
     public static int execute(CommandContext<ServerCommandSource> ctx, int value) {
         config.configdroprate = value;
@@ -145,6 +155,7 @@ public class InventoryCommand {
         player.sendMessage(new LiteralText("/inventory disable binding - makes the binding curse ineffective"), false);
         player.sendMessage(new LiteralText("/inventory enable binding - turns binding back on"), false);
         player.sendMessage(new LiteralText("/inventory enable vanishing - turns vanishing back on"), false);
+        player.sendMessage(new LiteralText("/inventory roundUp - experimental feature, tells inventory to round up or not"), false);
         player.sendMessage(new LiteralText("/inventory help  - also displays this message"), false);
         player.sendMessage(new LiteralText("--------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
         player.sendMessage(new LiteralText("Issues ? : https://github.com/OverlordsIII/ConfiguredKeepInventory/issues"), false);

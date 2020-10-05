@@ -13,6 +13,8 @@ public class InventoryConfig implements ConfigData {
     public boolean enableConfig = true;
     @Comment("Specifies what percentage of items drop. The rest of the items stay in the inventory. Curse of vanishing is not affected by this rule")
     public int configdroprate = 100;
+    @Comment("Tells the inventory to round up when calculating which items to drop and which stay in your inventory. If false it rounds down")
+    public boolean roundUp = true;
     @Comment("Specifies if commands can be used to control config values. Requires a game restart to enable changes. Cannot be changed via commands")
     public boolean commandUsage = true;
     @Comment("Specifies which items will always be saved and never lost, even if config droprate is 100%. Does not work if curse of vanishing is on the item")

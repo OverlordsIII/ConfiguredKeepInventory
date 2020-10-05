@@ -5,6 +5,7 @@
   "mixins": [
     "CommandManagerMixin",
     "EnchantmentHelperMixin",
+    "LivingEntityMixin",
     "PlayerEntityMixin",
     "PlayerInventoryMixin",
     "ServerPlayerEntityMixin"

@@ -4,6 +4,7 @@ package io.github.overlordsiii.mixin;
 import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.mixinterfaces.PlayerInventoryExt;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -56,24 +57,41 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
 
     @Override
     public void configureDrop(DefaultedList<ItemStack> stacks) {
-        for (int i = 0; i < stacks.size(); i++){
+        for (int i = 0; i < stacks.size(); i++) {
             ItemStack stack = stacks.get(i);
             double percent = ConfiguredKeepInventory.Config.configdroprate / 100.0;
             double newStackCount = (percent * stack.getCount());
-            if (EnchantmentHelper.hasVanishingCurse(stack)) {
-                stacks.set(i, ItemStack.EMPTY);
-            }
-            else if (stack.getCount() == 1){
-                if (ConfiguredKeepInventory.Config.configdroprate > 50){
-                    this.player.dropItem(stack, false);
+            if (!stack.isEmpty()) {
+                if (EnchantmentHelper.hasVanishingCurse(stack)) {
                     stacks.set(i, ItemStack.EMPTY);
+                } else if (!ConfiguredKeepInventory.Config.namesSavedList.contains(stack.getName().asString()) && !ConfiguredKeepInventory.Config.itemsSavedList.contains(stack.getItem().toString())) {
+                    if (stack.getCount() == 1) {
+                        if (ConfiguredKeepInventory.Config.configdroprate > 50) {
+                            this.player.dropItem(stack, false);
+                            stacks.set(i, ItemStack.EMPTY);
+                        }
+                    } else {
+                        System.out.println("New Stack Count = " + newStackCount);
+                        System.out.println("As int rounded down = " + (int)newStackCount);
+                        System.out.println("Stack = " + stack);
+                        System.out.println("Math round = " + Math.round(newStackCount));
+                        System.out.println("As int rounded up = " + (int) Math.round(newStackCount));
+                        ItemStack copyStack;
+                        if (ConfiguredKeepInventory.Config.roundUp) {
+                            stack.decrement(((int) Math.round(newStackCount)));
+                            copyStack = new ItemStack(stack.getItem(), (int) Math.round(newStackCount));
+                        }
+                        else{
+                            stack.decrement((int)newStackCount);
+                            copyStack = new ItemStack(stack.getItem(), (int)newStackCount);
+                        }
+                        System.out.println("Copy Stack = " + copyStack);
+                        ItemEntity entity = this.player.dropItem(copyStack, false);
+                        System.out.println(entity);
+                      //  System.out.println("ItemEntitySpawned = " + this.player.dropItem(copyStack, false).createSpawnPacket());
+                        stacks.set(i, stack);
+                    }
                 }
-            }
-            else if (!ConfiguredKeepInventory.Config.namesSavedList.contains(stack.getName().asString()) && !ConfiguredKeepInventory.Config.itemsSavedList.contains(stack.getItem().toString())){
-                stack.decrement(((int) Math.round(newStackCount)));
-                ItemStack copyStack = new ItemStack(stack.getItem(), (int) Math.round(newStackCount));
-                this.player.dropItem(copyStack, false);
-                stacks.set(i, stack);
             }
         }
     }
