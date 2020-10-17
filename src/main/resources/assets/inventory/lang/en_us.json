@@ -1,0 +1,23 @@
+{
+  "comment": "This is for autoconfig lang translations",
+  "text.autoconfig.inventory.category.Core": "Core Features",
+  "text.autoconfig.inventory.category.KeepInventoryConfig": "Keep Inventory Features",
+  "text.autoconfig.inventory.category.EnchantmentConfig": "Enchantment Features",
+  "text.autoconfig.inventory.category.OffHandTweaks": "Offhand Features",
+  "text.autoconfig.inventory.option.enableConfig": "Enable Config",
+  "text.autoconfig.inventory.option.commandUsage": "Commands can be used",
+  "text.autoconfig.inventory.option.needsOP": "Commands need OP",
+  "text.autoconfig.inventory.option.configdroprate": "KeepInventory Droprate",
+  "text.autoconfig.inventory.option.roundUp": "Inventory Drops are Rounded Up",
+  "text.autoconfig.inventory.option.itemsSavedList": "Items Saved on Death",
+  "text.autoconfig.inventory.option.namesSavedList": "Items with Names Saved on Death",
+  "text.autoconfig.inventory.option.disableVanishingCurse": "Disable Vanishing Curse",
+  "text.autoconfig.inventory.option.disableBindingCurse": "Disable Binding Curse",
+  "text.autoconfig.inventory.option.elytraRockets": "OffHand Rockets while Wearing Elytra",
+  "text.autoconfig.inventory.option.inventoryTotems": "Totems can be Used Anywhere",
+  "text.autoconfig.inventory.option.hungerReplenish": "Hunger is Automatically Replenished",
+  "text.autoconfig.inventory.option.hungerRefreshLimit": "Rate at which hunger starts replenishing",
+  "text.autoconfig.inventory.option.debugTotems": "Totems activate on falling out of World",
+  "text.autoconfig.inventory.title": "Configured Inventory Mod Menu Config",
+  "text.autoconfig.inventory.option.helpFullDeathMessages": "Helpfull Death Messages"
+}

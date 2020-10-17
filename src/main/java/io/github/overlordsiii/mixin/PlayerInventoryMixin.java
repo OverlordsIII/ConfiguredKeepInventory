@@ -7,19 +7,14 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Iterator;
-import java.util.List;
 
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
@@ -33,6 +28,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     @Shadow @Final public DefaultedList<ItemStack> main;
 
     @Shadow @Final public DefaultedList<ItemStack> armor;
+    /*
     @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z"))
     private boolean droredirect(Iterator iterator){
         //redirect for vanilla behavior
@@ -42,18 +38,20 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
 
     @Inject(method = "dropAll", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
     private void capture(CallbackInfo ci, Iterator<List<ItemStack>> var1){
-        //ad custom behavior if mod is enabled
+        //add custom behavior if mod is enabled
         if (ConfiguredKeepInventory.Config.enableConfig){
                     this.configureDrop(this.main);
                     this.configureDrop(this.armor);
                     this.configureDrop(this.offHand);
                 }
         }
+     */
 
     /**
      * method that sorts a specific inventory
      * @param stacks the inventory that you want to sort
      */
+    @Unique
     @Override
     public void configureDrop(DefaultedList<ItemStack> stacks) {
         for (int i = 0; i < stacks.size(); i++) {
@@ -72,12 +70,6 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
                     } else {
                         ItemStack copyStack;
                         copyStack = stack.copy();
-                 //       System.out.println("processing stack  = " + stack);
-                 //       System.out.println("new stack count = " + newStackCount);
-                 //       System.out.println("Math Round = " + Math.round(newStackCount));
-                  //      System.out.println("as int rounded up = " + (int)Math.round(newStackCount));
-                  //      System.out.println("as int rounded down = " + (int)newStackCount);
-                  //      System.out.println("round up = " + ConfiguredKeepInventory.Config.roundUp);
                         if (ConfiguredKeepInventory.Config.roundUp) {
                            copyStack.setCount((int)Math.round(newStackCount));
                             stack.decrement(((int) Math.round(newStackCount)));
@@ -86,9 +78,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
                             copyStack.setCount((int)newStackCount);
                             stack.decrement((int)newStackCount);
                         }
-                       // System.out.println("Copy Stack = " + copyStack);
                         ItemEntity entity = this.player.dropItem(copyStack, false);
-                        System.out.println(entity);
                         stacks.set(i, stack);
                     }
                 }
@@ -96,6 +86,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
         }
     }
     //coming soon
+    @Unique
     /**
      * A method that sorts your offhand based on the stack.
      * @param stack that you want sorted
@@ -112,12 +103,14 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
                    this.main.set(item, currentOffStack);
                    this.offHand.set(0, wantedStack);
                 }
-                else{
-                   int slot = this.indexOfArmor(stack);
-                   ItemStack currentOffHandStack = this.offHand.get(0);
-                   ItemStack wantedStack = this.armor.get(slot);
-                   this.armor.set(slot, currentOffHandStack);
-                   this.offHand.set(0, wantedStack);
+                else {
+                    int slot = this.indexOfArmor(stack);
+                    if (slot != -1) {
+                        ItemStack currentOffHandStack = this.offHand.get(0);
+                        ItemStack wantedStack = this.armor.get(slot);
+                        this.armor.set(slot, currentOffHandStack);
+                        this.offHand.set(0, wantedStack);
+                    }
                 }
             }
         }
@@ -125,13 +118,13 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     /**
      * a method that searches through a pregenerated list based on the cycle num
      */
+    @Unique
     @Override
     public void sortOffHand() {
 
     }
-
+    @Unique
     @Override
-
     public void sortHotBar(DefaultedList<ItemStack> stack) {
 
     }
@@ -141,9 +134,8 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
      * @param stack wanted stack
      * @return index of stack in the main slot
      */
-
+    @Unique
     @Override
-
     public int indexOf(ItemStack stack) {
         for (int i = 0; i < this.main.size(); i++){
             ItemStack itemStack = this.main.get(i);
@@ -159,7 +151,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
      * @param stack wanted stack
      * @return index of the stack in armor slots
     */
-
+    @Unique
     @Override
     public int indexOfArmor(ItemStack stack){
         for (int i = 0; i < this.armor.size(); i++){
@@ -171,6 +163,36 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
         return -1;
     }
 
+    /**
+     * Searches through the main inventory and returns the slot number of a food item
+     * @return the int of the slot that the stack that is a food is in
+     */
+    @Unique
+    @Override
+    public int indexOfFood() {
+        for (int i = 0; i < this.main.size(); i++){
+            ItemStack stack = this.main.get(i);
+           Item item = stack.getItem();
+           if (item.isFood()){
+               return i;
+           }
+        }
 
+        return -1;
+    }
+
+    /**
+     * Attempt to use less invasive mixins
+     * see {@link PlayerEntityMixin#safeInv(CallbackInfo)}
+     */
+    @Unique
+    @Override
+    public void dropInventory() {
+        if (ConfiguredKeepInventory.Config.enableConfig) {
+            this.configureDrop(this.main);
+            this.configureDrop(this.armor);
+            this.configureDrop(this.offHand);
+        }
+    }
 }
 

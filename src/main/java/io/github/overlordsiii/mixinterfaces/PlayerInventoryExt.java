@@ -11,4 +11,6 @@ public interface PlayerInventoryExt {
     int indexOfArmor(ItemStack stack);
     void sortOffHand();
     void configureDrop(DefaultedList<ItemStack> stacks);
+    int indexOfFood();
+    void dropInventory();
 }

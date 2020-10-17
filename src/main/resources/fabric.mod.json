@@ -18,6 +18,9 @@
   "entrypoints": {
     "main": [
       "io.github.overlordsiii.ConfiguredKeepInventory"
+    ],
+    "modmenu": [
+      "io.github.overlordsiii.integration.ModMenuIntegration"
     ]
   },
   "mixins": [
