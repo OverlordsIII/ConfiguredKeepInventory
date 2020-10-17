@@ -7,13 +7,13 @@ The mod uses commands to change config values, but you can change them manually 
 * item droprate changes (Change the amount of items that fall)
 * item saved on death (If specified, a specific item will stay in your inventory no matter the droprate)
 * names saved on death (If specified, if the item is named (through an anvil), and the name of the item is in the config, that item will be saved)
+* Allows you to autofill your hunger if food is in your inventory
+* Totems activate anywhere in your inventory on death, not just in your hand/offhand
+* Players can teleport where a player has died or used a totem to help them out. (Disabled by default)
 * disabling of vanishing curse
 * disabling of the binding curse
 * Serverside command system to configure the mod
 * Mod Menu integration for integrated server (i.e singleplayer worlds)
-* Totems activate anywhere in your inventory on death, not just in your hand/offhand
-* Players can teleport where a player has died or used a totem to help them out. (Disabled by default)
-* Allows you to autofill your hunger if food is in your inventory
 * Allows totems to work even if you /kill or fall into the void
 
 ## Inventory Command
