@@ -1,6 +1,6 @@
 # Configured Keep Inventory
 
-This is a serverside fabric mod that allows you to control how many items leave and stay in your inventory when you die.
+This is a serverside fabric mod that allows you to control how many items leave and stay in your inventory when you die. [get it here](https://www.curseforge.com/minecraft/mc-mods/configured-keep-inventory)
 
 The mod uses commands to change config values, but you can change them manually by editing the `inventoryconfig.json5` file located in your minecraft's config directory.
 ## Features
