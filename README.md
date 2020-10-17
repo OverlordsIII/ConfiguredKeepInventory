@@ -1,6 +1,6 @@
 # Configured Keep Inventory
 
-This is a serverside fabric mod that allows you to control how many items leave and stay in your inventory when you die. [get it here](https://www.curseforge.com/minecraft/mc-mods/configured-keep-inventory)
+This is a serverside fabric mod that allows you to control how many items leave and stay in your inventory when you die. [Find the latest releases here](https://www.curseforge.com/minecraft/mc-mods/configured-keep-inventory)
 
 The mod uses commands to change config values, but you can change them manually by editing the `inventoryconfig.json5` file located in your minecraft's config directory.
 ## Features
@@ -9,6 +9,12 @@ The mod uses commands to change config values, but you can change them manually 
 * names saved on death (If specified, if the item is named (through an anvil), and the name of the item is in the config, that item will be saved)
 * disabling of vanishing curse
 * disabling of the binding curse
+* Serverside command system to configure the mod
+* Mod Menu integration for integrated server (i.e singleplayer worlds)
+* Totems activate anywhere in your inventory on death, not just in your hand/offhand
+* Players can teleport where a player has died or used a totem to help them out. (Disabled by default)
+* Allows you to autofill your hunger if food is in your inventory
+* Allows totems to work even if you /kill or fall into the void
 
 ## Inventory Command
 To interact with the mod, do /inventory to access the commands. A full tree of the command is listed below.
