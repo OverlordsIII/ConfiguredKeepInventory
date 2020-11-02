@@ -44,16 +44,25 @@ public abstract class LivingEntityMixin extends Entity {
                   else{
                       suggestedCommand = "/tp " + this.getX() + " " + this.getY() + " " + this.getZ();
                   }
-                  entity.world.getServer().getPlayerManager().broadcastChatMessage(
-                          new LiteralText(entity.getName().asString() + " has used a totem!")
-                                  .formatted(Formatting.YELLOW)
-                                  .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT
-                                          , new LiteralText(ConfiguredKeepInventory.Config.helpFullDeathMessage)
-                                          .formatted(Formatting.AQUA)))
-                                          .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND
-                                                  , suggestedCommand))),
-                          MessageType.SYSTEM,
-                          entity.getUuid());
+                  if (!Config.needsOP) {
+                      entity.world.getServer().getPlayerManager().broadcastChatMessage(
+                              new LiteralText(entity.getName().asString() + " has used a totem!")
+                                      .formatted(Formatting.YELLOW)
+                                      .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT
+                                              , new LiteralText(ConfiguredKeepInventory.Config.helpFullDeathMessage)
+                                              .formatted(Formatting.AQUA)))
+                                              .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND
+                                                      , suggestedCommand))),
+                              MessageType.SYSTEM,
+                              entity.getUuid());
+                  }
+                  else{
+                      entity.server.getPlayerManager().broadcastChatMessage(new LiteralText(entity.getName().asString() + " has used a totem!"), MessageType.SYSTEM, entity.getUuid());
+                      ((ServerCommandSourceInvoker)entity.server.getCommandSource())
+                              .sendToOps(new LiteralText(Config.helpFullDeathMessage)
+                                      .formatted(Formatting.YELLOW).styled(style -> style
+                                              .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand))));
+                  }
               }
               if (slot != -1){
                  return entity.inventory.main.get(slot);

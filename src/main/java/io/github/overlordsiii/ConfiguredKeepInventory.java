@@ -24,7 +24,6 @@ public class ConfiguredKeepInventory implements ModInitializer {
     @Override
     public void onInitialize() {
         TOTEM_REPLACEMENT.bypassesArmor();
-        // Get the private field
     }
 
 }

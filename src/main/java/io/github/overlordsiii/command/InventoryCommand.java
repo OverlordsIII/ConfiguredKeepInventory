@@ -8,6 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.config.InventoryConfig;
 import io.github.overlordsiii.mixinterfaces.PlayerInventoryExt;
+import jdk.internal.jline.internal.Nullable;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -163,7 +164,7 @@ public class InventoryCommand {
             case "droprate": config.configdroprate = current;
             case "hungerRefresh": config.hungerRefreshLimit = current;
         }
-        ctx.getSource().sendFeedback(new LiteralText(displayedtext + current + percent)
+        ctx.getSource().sendFeedback(new LiteralText(displayedtext + current + " " + percent)
                 .formatted(Formatting.WHITE)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND
@@ -174,7 +175,7 @@ public class InventoryCommand {
         manager.save();
         return 1;
     }
-    private static int executeAdd(CommandContext<ServerCommandSource> ctx, ArrayList<String> list, String toAdd, String displayedText, String literal, Item nullable) throws CommandSyntaxException {
+    private static int executeAdd(CommandContext<ServerCommandSource> ctx, ArrayList<String> list, String toAdd, String displayedText, String literal, @Nullable Item nullable) throws CommandSyntaxException {
         if (!list.contains(toAdd)) {
             list.add(toAdd);
           String finalString = String.format(displayedText, toAdd);
@@ -238,12 +239,15 @@ public class InventoryCommand {
     private static int executeInfo(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         try {
             for (Field field : InventoryConfig.class.getDeclaredFields()) {
+
                     ctx.getSource().getPlayer().sendMessage(
                             new LiteralText(field.getName() + " = " + field.get(config).toString())
                                     .styled(style -> style.withClickEvent(
                                             FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ?
-                                                    new ClickEvent(ClickEvent.Action.OPEN_FILE, FabricLoader.getInstance().getConfigDir() + "inventory.json5")
+                                                    new ClickEvent(ClickEvent.Action.OPEN_FILE, FabricLoader.getInstance().getConfigDir() + "\\" + "inventory.json5")
                                                     : new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/inventory info"))), false);
+
+
                 }
         } catch (IllegalAccessException ex){
             ex.printStackTrace();
