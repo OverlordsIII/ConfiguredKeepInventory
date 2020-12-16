@@ -72,5 +72,8 @@ public class InventoryConfig implements ConfigData {
     @ConfigEntry.Category("OffHandTweaks")
     @Comment("If this is on, totems will activate even if you fall out of the world")
     public boolean debugTotems = true;
+    @ConfigEntry.Category("KeepInventoryConfig")
+    @Comment("If this is on, xp will be lost on death")
+    public boolean loseXpOnDeath = true;
 
 }

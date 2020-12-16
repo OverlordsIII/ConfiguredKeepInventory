@@ -3,6 +3,7 @@ package io.github.overlordsiii.mixin;
 import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.config.InventoryConfig;
 import io.github.overlordsiii.mixinterfaces.PlayerInventoryExt;
+import io.github.overlordsiii.util.CommandSourceUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -17,6 +18,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
@@ -24,6 +26,8 @@ import java.util.Objects;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
+    @Shadow protected abstract void dropXp();
+
     public InventoryConfig Config = ConfiguredKeepInventory.Config;
 
     public LivingEntityMixin(EntityType<?> type, World world) {
@@ -58,8 +62,8 @@ public abstract class LivingEntityMixin extends Entity {
                   }
                   else{
                       entity.server.getPlayerManager().broadcastChatMessage(new LiteralText(entity.getName().asString() + " has used a totem!"), MessageType.SYSTEM, entity.getUuid());
-                      ((ServerCommandSourceInvoker)entity.server.getCommandSource())
-                              .sendToOps(new LiteralText(Config.helpFullDeathMessage)
+                      CommandSourceUtil
+                              .sendToOps(this.world.getServer().getCommandSource(), (LiteralText) new LiteralText(Config.helpFullDeathMessage)
                                       .formatted(Formatting.YELLOW).styled(style -> style
                                               .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand))));
                   }

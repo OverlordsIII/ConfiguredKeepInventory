@@ -18,6 +18,7 @@
   "text.autoconfig.inventory.option.hungerReplenish": "Hunger is Automatically Replenished",
   "text.autoconfig.inventory.option.hungerRefreshLimit": "Rate at which hunger starts replenishing",
   "text.autoconfig.inventory.option.debugTotems": "Totems activate on falling out of World",
+  "text.autoconfig.inventory.option.loseXpOnDeath": "Xp Lost on Death",
   "text.autoconfig.inventory.title": "Configured Inventory Mod Menu Config",
   "text.autoconfig.inventory.option.helpFullDeathMessages": "Helpfull Death Messages",
   "text.autoconfig.inventory.option.helpFullDeathMessage": "Death Message (if enabled)"

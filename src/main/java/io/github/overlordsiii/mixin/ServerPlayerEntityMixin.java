@@ -3,6 +3,7 @@ package io.github.overlordsiii.mixin;
 
 import com.mojang.authlib.GameProfile;
 import io.github.overlordsiii.ConfiguredKeepInventory;
+import io.github.overlordsiii.util.CommandSourceUtil;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
@@ -41,6 +42,17 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
     private boolean redirect(GameRules gameRules, GameRules.Key<GameRules.BooleanRule> rule){
         return gameRules.getBoolean(GameRules.KEEP_INVENTORY) || ConfiguredKeepInventory.Config.enableConfig;
     }
+
+    @Inject(method = "copyFrom", at = @At("TAIL"))
+    private void changeXP(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
+        if (ConfiguredKeepInventory.Config.enableConfig && ConfiguredKeepInventory.Config.loseXpOnDeath && !this.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+            this.experienceLevel = 0;
+            this.experienceProgress = 0;
+            this.totalExperience = 0;
+        }
+    }
+
+
     @Inject(method = "onDeath", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/entity/damage/DamageTracker;getDeathMessage()Lnet/minecraft/text/Text;", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void helpfuldeathMessages(DamageSource arg0, CallbackInfo ci, boolean bl, Text text){
         if (text instanceof TranslatableText && ConfiguredKeepInventory.Config.helpFullDeathMessages) {
@@ -52,15 +64,15 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
             }
             TranslatableText translatableText = (TranslatableText) text;
             if (!ConfiguredKeepInventory.Config.needsOP) {
-                translatableText
+              translatableText
                         .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT
                                 , new LiteralText(ConfiguredKeepInventory.Config.helpFullDeathMessage)))
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND
                                         , suggestedCommand)));
             }
             else{
-                ((ServerCommandSourceInvoker)this.server.getCommandSource())
-                        .sendToOps(new LiteralText(ConfiguredKeepInventory.Config.helpFullDeathMessage)
+                CommandSourceUtil
+                        .sendToOps(this.server.getCommandSource(), (LiteralText) new LiteralText(ConfiguredKeepInventory.Config.helpFullDeathMessage)
                                 .styled(style -> style.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand))));
             }
         }

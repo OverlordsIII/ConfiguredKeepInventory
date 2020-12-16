@@ -9,7 +9,6 @@
     "LivingEntityMixin",
     "PlayerEntityMixin",
     "PlayerInventoryMixin",
-    "ServerCommandSourceInvoker",
     "ServerPlayerEntityMixin"
   ],
   "client": [
