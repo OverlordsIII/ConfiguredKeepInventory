@@ -28,11 +28,11 @@ import java.util.Objects;
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
-    @Shadow public abstract ServerWorld getServerWorld();
-
     @Shadow public abstract RegistryKey<World> getSpawnPointDimension();
 
     @Shadow @Final public MinecraftServer server;
+
+    @Shadow public abstract ServerWorld getWorld();
 
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);
@@ -55,14 +55,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method = "onDeath", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/entity/damage/DamageTracker;getDeathMessage()Lnet/minecraft/text/Text;", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void helpfuldeathMessages(DamageSource arg0, CallbackInfo ci, boolean bl, Text text){
-        if (text instanceof TranslatableText && ConfiguredKeepInventory.Config.helpFullDeathMessages) {
+        if (text instanceof TranslatableText translatableText && ConfiguredKeepInventory.Config.helpFullDeathMessages) {
             String suggestedCommand;
-            if (!this.getServerWorld().getDimension().equals(Objects.requireNonNull(this.server.getWorld(getSpawnPointDimension())).getDimension())) {
-                suggestedCommand = "/execute in " + this.getServerWorld().getRegistryKey().getValue() + " run teleport " + this.getX() + " " + this.getY() + " " + this.getZ();
+            if (!this.getWorld().getDimension().equals(Objects.requireNonNull(this.server.getWorld(getSpawnPointDimension())).getDimension())) {
+                suggestedCommand = "/execute in " + this.getWorld().getRegistryKey().getValue() + " run teleport " + this.getX() + " " + this.getY() + " " + this.getZ();
             } else {
                 suggestedCommand = "/tp " + this.getX() + " " + this.getY() + " " + this.getZ();
             }
-            TranslatableText translatableText = (TranslatableText) text;
             if (!ConfiguredKeepInventory.Config.needsOP) {
               translatableText
                         .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT

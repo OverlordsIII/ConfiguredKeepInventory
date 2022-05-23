@@ -27,7 +27,7 @@
     "inventory.config.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.9.1+build.205",
-    "minecraft": "1.16.x"
+    "fabricloader": "0.14.x",
+    "minecraft": "1.18.x"
   }
 }

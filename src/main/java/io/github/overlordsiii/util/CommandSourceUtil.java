@@ -5,8 +5,8 @@ import net.minecraft.text.LiteralText;
 
 public class CommandSourceUtil {
     public static void sendToOps(ServerCommandSource ctx, LiteralText text){
-        ctx.getMinecraftServer().getPlayerManager().getPlayerList().forEach((serverPlayerEntity -> {
-            if (ctx.getMinecraftServer().getPlayerManager().isOperator(serverPlayerEntity.getGameProfile())){
+        ctx.getServer().getPlayerManager().getPlayerList().forEach((serverPlayerEntity -> {
+            if (ctx.getServer().getPlayerManager().isOperator(serverPlayerEntity.getGameProfile())){
                 serverPlayerEntity.sendMessage(text, false);
             }
         }));

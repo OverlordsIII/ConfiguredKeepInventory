@@ -38,18 +38,18 @@ public abstract class LivingEntityMixin extends Entity {
     private ItemStack modifyStackCall(ItemStack stack){
         if ((LivingEntity)(Object)this instanceof ServerPlayerEntity && ConfiguredKeepInventory.Config.inventoryTotems && Config.enableConfig){
             ServerPlayerEntity entity = (ServerPlayerEntity)(Object)this;
-           if (entity.inventory.contains(new ItemStack(Items.TOTEM_OF_UNDYING))){
-              int slot = ((PlayerInventoryExt)entity.inventory).indexOf(new ItemStack(Items.TOTEM_OF_UNDYING));
+           if (entity.getInventory().contains(new ItemStack(Items.TOTEM_OF_UNDYING))){
+              int slot = ((PlayerInventoryExt)entity.getInventory()).indexOf(new ItemStack(Items.TOTEM_OF_UNDYING));
               if (Config.helpFullDeathMessages) {
                   String suggestedCommand;
-                  if (!entity.getServerWorld().getDimension().equals(Objects.requireNonNull(entity.server.getWorld(entity.getSpawnPointDimension())).getDimension())){
-                      suggestedCommand = "/execute in " + entity.getServerWorld().getRegistryKey().getValue() + " run teleport " + this.getX() + " " + this.getY() + " " + this.getZ();
+                  if (!entity.getWorld().getDimension().equals(Objects.requireNonNull(entity.server.getWorld(entity.getSpawnPointDimension())).getDimension())){
+                      suggestedCommand = "/execute in " + entity.getWorld().getRegistryKey().getValue() + " run teleport " + this.getX() + " " + this.getY() + " " + this.getZ();
                   }
                   else{
                       suggestedCommand = "/tp " + this.getX() + " " + this.getY() + " " + this.getZ();
                   }
                   if (!Config.needsOP) {
-                      entity.world.getServer().getPlayerManager().broadcastChatMessage(
+                      entity.world.getServer().getPlayerManager().broadcast(
                               new LiteralText(entity.getName().asString() + " has used a totem!")
                                       .formatted(Formatting.YELLOW)
                                       .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT
@@ -61,7 +61,7 @@ public abstract class LivingEntityMixin extends Entity {
                               entity.getUuid());
                   }
                   else{
-                      entity.server.getPlayerManager().broadcastChatMessage(new LiteralText(entity.getName().asString() + " has used a totem!"), MessageType.SYSTEM, entity.getUuid());
+                      entity.server.getPlayerManager().broadcast(new LiteralText(entity.getName().asString() + " has used a totem!"), MessageType.SYSTEM, entity.getUuid());
                       CommandSourceUtil
                               .sendToOps(this.world.getServer().getCommandSource(), (LiteralText) new LiteralText(Config.helpFullDeathMessage)
                                       .formatted(Formatting.YELLOW).styled(style -> style
@@ -69,10 +69,10 @@ public abstract class LivingEntityMixin extends Entity {
                   }
               }
               if (slot != -1){
-                 return entity.inventory.main.get(slot);
+                 return entity.getInventory().main.get(slot);
               }
               else{
-                  return entity.inventory.offHand.get(0);
+                  return entity.getInventory().offHand.get(0);
               }
            }
         }

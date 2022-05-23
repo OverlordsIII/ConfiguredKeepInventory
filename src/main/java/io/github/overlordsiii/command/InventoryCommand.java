@@ -8,8 +8,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.config.InventoryConfig;
 import io.github.overlordsiii.mixinterfaces.PlayerInventoryExt;
-import jdk.internal.jline.internal.Nullable;
-import me.sargunvohra.mcmods.autoconfig1u.ConfigManager;
+import me.shedaniel.autoconfig.ConfigManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.argument.ItemStackArgumentType;
@@ -24,6 +23,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.registry.Registry;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
@@ -104,7 +104,7 @@ public class InventoryCommand {
         return 1;
     }
     private static int executeSortOffhand(CommandContext<ServerCommandSource> ctx, Item itemToSort, String literal, String displayText) throws CommandSyntaxException {
-       PlayerInventory inventory = ctx.getSource().getPlayer().inventory;
+       PlayerInventory inventory = ctx.getSource().getPlayer().getInventory();
         ((PlayerInventoryExt)inventory).sortOffHand(new ItemStack(itemToSort));
        String finalString =  String.format(displayText, itemToSort.toString());
         ctx.getSource().sendFeedback(new LiteralText(finalString)
