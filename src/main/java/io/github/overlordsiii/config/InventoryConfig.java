@@ -1,9 +1,9 @@
 package io.github.overlordsiii.config;
 
-import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
-import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
-import me.sargunvohra.mcmods.autoconfig1u.shadowed.blue.endless.jankson.Comment;
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.autoconfig.annotation.ConfigEntry;
+import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,5 +75,4 @@ public class InventoryConfig implements ConfigData {
     @ConfigEntry.Category("KeepInventoryConfig")
     @Comment("If this is on, xp will be lost on death")
     public boolean loseXpOnDeath = true;
-
 }

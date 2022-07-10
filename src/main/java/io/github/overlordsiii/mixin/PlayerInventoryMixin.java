@@ -1,7 +1,6 @@
 package io.github.overlordsiii.mixin;
 
 
-import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.mixinterfaces.PlayerInventoryExt;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ItemEntity;
@@ -16,6 +15,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.List;
+
+import static io.github.overlordsiii.ConfiguredKeepInventory.Config;
+
 @Mixin(PlayerInventory.class)
 public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
 
@@ -28,24 +31,6 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     @Shadow @Final public DefaultedList<ItemStack> main;
 
     @Shadow @Final public DefaultedList<ItemStack> armor;
-    /*
-    @Redirect(method = "dropAll", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z"))
-    private boolean droredirect(Iterator iterator){
-        //redirect for vanilla behavior
-        return iterator.hasNext() && !ConfiguredKeepInventory.Config.enableConfig;
-    }
-
-
-    @Inject(method = "dropAll", at = @At(value = "RETURN"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private void capture(CallbackInfo ci, Iterator<List<ItemStack>> var1){
-        //add custom behavior if mod is enabled
-        if (ConfiguredKeepInventory.Config.enableConfig){
-                    this.configureDrop(this.main);
-                    this.configureDrop(this.armor);
-                    this.configureDrop(this.offHand);
-                }
-        }
-     */
 
     /**
      * method that sorts a specific inventory
@@ -56,21 +41,24 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     public void configureDrop(DefaultedList<ItemStack> stacks) {
         for (int i = 0; i < stacks.size(); i++) {
             ItemStack stack = stacks.get(i);
-            double percent = ConfiguredKeepInventory.Config.configdroprate / 100.0;
+            List<String> namesSavedList = Config.namesSavedList;
+            List<String> itemSaveList = Config.itemsSavedList;
+            boolean bl = !namesSavedList.contains(stack.getName().getString()) && !itemSaveList.contains(stack.getItem().toString());
+            double percent = Config.configdroprate / 100.0;
             double newStackCount = (percent * stack.getCount());
             if (!stack.isEmpty()) {
                 if (EnchantmentHelper.hasVanishingCurse(stack)) {
                     stacks.set(i, ItemStack.EMPTY);
-                } else if (!ConfiguredKeepInventory.Config.namesSavedList.contains(stack.getName().asString()) && !ConfiguredKeepInventory.Config.itemsSavedList.contains(stack.getItem().toString())) {
+                } else if (bl) {
                     if (stack.getCount() == 1) {
-                        if (ConfiguredKeepInventory.Config.configdroprate > 50) {
+                        if (Config.configdroprate > 50) {
                             this.player.dropItem(stack, false);
                             stacks.set(i, ItemStack.EMPTY);
                         }
                     } else {
                         ItemStack copyStack;
                         copyStack = stack.copy();
-                        if (ConfiguredKeepInventory.Config.roundUp) {
+                        if (Config.roundUp) {
                            copyStack.setCount((int)Math.round(newStackCount));
                             stack.decrement(((int) Math.round(newStackCount)));
                         }
@@ -188,7 +176,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     @Unique
     @Override
     public void dropInventory() {
-        if (ConfiguredKeepInventory.Config.enableConfig) {
+        if (Config.enableConfig) {
             this.configureDrop(this.main);
             this.configureDrop(this.armor);
             this.configureDrop(this.offHand);

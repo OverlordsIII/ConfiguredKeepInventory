@@ -8,10 +8,10 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.config.InventoryConfig;
 import io.github.overlordsiii.mixinterfaces.PlayerInventoryExt;
-import jdk.internal.jline.internal.Nullable;
-import me.sargunvohra.mcmods.autoconfig1u.ConfigManager;
+import me.shedaniel.autoconfig.ConfigManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -20,10 +20,11 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.registry.Registry;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class InventoryCommand {
     private static InventoryConfig config = ConfiguredKeepInventory.Config;
     private static ConfigManager manager = ConfiguredKeepInventory.manager;
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher){
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess access){
         dispatcher.register(literal("inventory")
             .requires(source -> config.needsOP ? source.hasPermissionLevel(2) : source.hasPermissionLevel(0))
                 .then(literal("toggle")
@@ -53,7 +54,9 @@ public class InventoryCommand {
                     .then(literal("autoHungerReplenish")
                         .executes(context -> executeToggle(context, config.hungerReplenish, "Hunger Automatically Replenishing is now currently turned ", "autoHungerReplenish")))
                     .then(literal("helpfulDeathMsg")
-                        .executes(context -> executeToggle(context, config.helpFullDeathMessages, "Helpful Death Messages is now currently turned ", "helpfulDeathMsg"))))
+                        .executes(context -> executeToggle(context, config.helpFullDeathMessages, "Helpful Death Messages is now currently turned ", "helpfulDeathMsg")))
+                    .then(literal("xpLostOnDeath")
+                        .executes(context -> executeToggle(context, config.loseXpOnDeath, "Xp Lost on death is now turned ", "xpLostOnDeath"))))
                 .then(literal("set")
                     .then(literal("droprate")
                         .then(argument("droprate", IntegerArgumentType.integer(0, 100))
@@ -66,14 +69,14 @@ public class InventoryCommand {
                             .executes(context -> executeSetString(context, StringArgumentType.getString(context, "message"), "helpfullDeathMsg", "The Helpful Death Message is now \"%s\"")))))
                 .then(literal("add")
                     .then(literal("items")
-                        .then(argument("itemarg", ItemStackArgumentType.itemStack())
+                        .then(argument("itemarg", ItemStackArgumentType.itemStack(access))
                             .executes(context -> executeAdd(context, (ArrayList<String>) config.itemsSavedList, ItemStackArgumentType.getItemStackArgument(context, "itemarg").getItem().toString(), "Added item: %s to the item save list.", "items", ItemStackArgumentType.getItemStackArgument(context, "itemarg").getItem()))))
                     .then(literal("names")
-                        .then(argument("namearg", StringArgumentType.string())
+                        .then(argument("namearg", StringArgumentType.greedyString())
                             .executes(context -> executeAdd(context, (ArrayList<String>)config.namesSavedList, StringArgumentType.getString(context, "namearg"), "Added name: %s to the name save list", "names", null)))))
                 .then(literal("remove")
                     .then(literal("items")
-                        .then(argument("itemarg", ItemStackArgumentType.itemStack())
+                        .then(argument("itemarg", ItemStackArgumentType.itemStack(access))
                             .executes(context -> executeRemove(context, (ArrayList<String>)config.itemsSavedList, ItemStackArgumentType.getItemStackArgument(context, "itemarg").getItem().toString(), "Removed item %s from the item save list.", "items", ItemStackArgumentType.getItemStackArgument(context, "itemarg").getItem()))))
                     .then(literal("names")
                         .then(argument("namearg", StringArgumentType.string())
@@ -84,7 +87,7 @@ public class InventoryCommand {
                     .executes(InventoryCommand::executeInfo))
                 .then(literal("sort")
                     .then(literal("offhand")
-                        .then(argument("stack", ItemStackArgumentType.itemStack())
+                        .then(argument("stack", ItemStackArgumentType.itemStack(access))
                             .executes(context -> executeSortOffhand(context, ItemStackArgumentType.getItemStackArgument(context, "stack").getItem(), "offhand", "Sorted a %s stack into your offhand")))))
         );
     }
@@ -93,21 +96,26 @@ public class InventoryCommand {
         config.helpFullDeathMessage = newString;
         String finalString = String.format(displayText, newString);
         final String finalNewString = newString;
-        ctx.getSource().sendFeedback(new LiteralText(finalString)
+        ctx.getSource().sendFeedback(Text.literal(finalString)
                 .formatted(Formatting.LIGHT_PURPLE)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
                                 "/inventory set " + literal)).withHoverEvent(
                                         new HoverEvent(HoverEvent.Action.SHOW_TEXT
-                                                , new LiteralText(finalNewString)))), true);
+                                                , Text.literal(finalNewString)))), true);
         manager.save();
         return 1;
     }
-    private static int executeSortOffhand(CommandContext<ServerCommandSource> ctx, Item itemToSort, String literal, String displayText) throws CommandSyntaxException {
-       PlayerInventory inventory = ctx.getSource().getPlayer().inventory;
+    private static int executeSortOffhand(CommandContext<ServerCommandSource> ctx, Item itemToSort, String literal, String displayText) {
+        if (ctx.getSource().getPlayer() == null) {
+            ctx.getSource().sendFeedback(Text.literal("Run this command as a player!"), false);
+            return -1;
+        }
+
+       PlayerInventory inventory = ctx.getSource().getPlayer().getInventory();
         ((PlayerInventoryExt)inventory).sortOffHand(new ItemStack(itemToSort));
        String finalString =  String.format(displayText, itemToSort.toString());
-        ctx.getSource().sendFeedback(new LiteralText(finalString)
+        ctx.getSource().sendFeedback(Text.literal(finalString)
                 .formatted(Formatting.GRAY)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND
@@ -132,26 +140,27 @@ public class InventoryCommand {
         rule = !rule;
         //sad :( hardcode
         switch (literal){
-            case "mod": config.enableConfig = rule;
-            case "needsop": config.needsOP = rule;
-            case "roundup": config.roundUp = rule;
-            case "vanishing": config.disableVanishingCurse = rule;
-            case "binding": config.disableBindingCurse = rule;
-            case "inventoryTotem": config.inventoryTotems = rule;
-            case "autoHungerReplenish": config.hungerReplenish = rule;
-            case "helpfulDeathMsg": config.helpFullDeathMessages = rule;
+            case "mod": config.enableConfig = rule; break;
+            case "needsop": config.needsOP = rule; break;
+            case "roundup": config.roundUp = rule; break;
+            case "vanishing": config.disableVanishingCurse = rule; break;
+            case "binding": config.disableBindingCurse = rule; break;
+            case "inventoryTotem": config.inventoryTotems = rule; break;
+            case "autoHungerReplenish": config.hungerReplenish = rule; break;
+            case "helpfulDeathMsg": config.helpFullDeathMessages = rule; break;
+            case "xpLostOnDeath": config.loseXpOnDeath = rule; break;
         }
         String added = rule ? "on" : "off";
         if (displayedText.contains("Vanishing") || displayedText.contains("Binding")){
             added = rule ? "off" : "on";
         }
-        ctx.getSource().sendFeedback(new LiteralText(displayedText + added)
+        ctx.getSource().sendFeedback(Text.literal(displayedText + added)
                 .formatted(Formatting.GRAY)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND
                                 , "/inventory toggle " + literal))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT
-                                , new LiteralText("/inventory toggle " + literal))))
+                                , Text.literal("/inventory toggle " + literal))))
                 , true);
         manager.save();
         return 1;
@@ -164,13 +173,13 @@ public class InventoryCommand {
             case "droprate": config.configdroprate = current;
             case "hungerRefresh": config.hungerRefreshLimit = current;
         }
-        ctx.getSource().sendFeedback(new LiteralText(displayedtext + current + " " + percent)
+        ctx.getSource().sendFeedback(Text.literal(displayedtext + current + " " + percent)
                 .formatted(Formatting.WHITE)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND
                                 , "/inventory set " + literal + " " + tobeSet))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT
-                                , new LiteralText("/inventory set " + literal + " " + tobeSet))))
+                                , Text.literal("/inventory set " + literal + " " + tobeSet))))
                 , true);
         manager.save();
         return 1;
@@ -180,7 +189,7 @@ public class InventoryCommand {
             list.add(toAdd);
           String finalString = String.format(displayedText, toAdd);
           if (nullable != null) {
-              ctx.getSource().sendFeedback(new LiteralText(finalString)
+              ctx.getSource().sendFeedback(Text.literal(finalString)
                       .formatted(Formatting.GOLD)
                       .styled(style -> style.withItalic(true)
                               .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -191,7 +200,7 @@ public class InventoryCommand {
                       , true);
           }
           else{
-              ctx.getSource().sendFeedback(new LiteralText(finalString)
+              ctx.getSource().sendFeedback(Text.literal(finalString)
                       .formatted(Formatting.GOLD)
                       .styled(style -> style.withItalic(true)
                               .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -200,7 +209,7 @@ public class InventoryCommand {
           }
         }
         else{
-            ctx.getSource().getPlayer().sendMessage(new LiteralText("The Save List you tried to add to already had that item/name").formatted(Formatting.RED), false);
+            ctx.getSource().getPlayer().sendMessage(Text.literal("The Save List you tried to add to already had that item/name").formatted(Formatting.RED), false);
         }
         manager.save();
         return 1;
@@ -211,7 +220,7 @@ public class InventoryCommand {
             list.remove(toRemove);
             String finalString = String.format(displayedText, toRemove);
             if (nullable != null){
-                ctx.getSource().sendFeedback(new LiteralText(finalString)
+                ctx.getSource().sendFeedback(Text.literal(finalString)
                                 .formatted(Formatting.AQUA)
                                 .styled(style -> style.withItalic(true)
                                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -222,7 +231,7 @@ public class InventoryCommand {
                         , true);
             }
             else{
-                ctx.getSource().sendFeedback(new LiteralText(finalString)
+                ctx.getSource().sendFeedback(Text.literal(finalString)
                         .formatted(Formatting.AQUA)
                         .styled(style -> style.withItalic(true)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -231,7 +240,7 @@ public class InventoryCommand {
             }
         }
         else{
-            ctx.getSource().getPlayer().sendMessage(new LiteralText("The Save List you tried to remove from did not have that item/name").formatted(Formatting.RED), false);
+            ctx.getSource().getPlayer().sendMessage(Text.literal("The Save List you tried to remove from did not have that item/name").formatted(Formatting.RED), false);
         }
         manager.save();
         return 1;
@@ -239,9 +248,8 @@ public class InventoryCommand {
     private static int executeInfo(CommandContext<ServerCommandSource> ctx) throws CommandSyntaxException {
         try {
             for (Field field : InventoryConfig.class.getDeclaredFields()) {
-
                     ctx.getSource().getPlayer().sendMessage(
-                            new LiteralText(field.getName() + " = " + field.get(config).toString())
+                            Text.literal(field.getName() + " = " + field.get(config).toString())
                                     .styled(style -> style.withClickEvent(
                                             FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ?
                                                     new ClickEvent(ClickEvent.Action.OPEN_FILE, FabricLoader.getInstance().getConfigDir() + "\\" + "inventory.json5")
@@ -257,27 +265,27 @@ public class InventoryCommand {
 
     private static int executeSummary(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerPlayerEntity player = context.getSource().getPlayer();
-        player.sendMessage(new LiteralText("-------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
-        player.sendMessage(new LiteralText("                           Configured Inventory's Summary/Help"), false);
-        player.sendMessage(new LiteralText("/inventory set (integer) - sets the inventory droprate "), false);
-        player.sendMessage(new LiteralText("/inventory on/off - turns the mod on and off"), false);
-        player.sendMessage(new LiteralText("/inventory get info - sends all the info about the config values of the mod back to the player"), false);
-        player.sendMessage(new LiteralText("/inventory get summary - sends this message to the player"), false);
-        player.sendMessage(new LiteralText("/inventory add item (item) - adds an item to the item save list."), false);
-        player.sendMessage(new LiteralText("/inventory add name (name) - adds an name to the name save list. "), false);
-        player.sendMessage(new LiteralText("/inventory remove item (item) - removes an item from the item save list"), false);
-        player.sendMessage(new LiteralText("/inventory remove name (name) - removes an item from the name save list"), false);
-        player.sendMessage(new LiteralText("/inventory disable vanishing - makes the vanishing curse ineffective and now they drop like normal"), false);
-        player.sendMessage(new LiteralText("/inventory disable binding - makes the binding curse ineffective"), false);
-        player.sendMessage(new LiteralText("/inventory enable binding - turns binding back on"), false);
-        player.sendMessage(new LiteralText("/inventory enable vanishing - turns vanishing back on"), false);
-        player.sendMessage(new LiteralText("/inventory roundUp - experimental feature, tells inventory to round up or not"), false);
-        player.sendMessage(new LiteralText("/inventory help  - also displays this message"), false);
-        player.sendMessage(new LiteralText("--------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
-        player.sendMessage(new LiteralText("Issues ? : https://github.com/OverlordsIII/ConfiguredKeepInventory/issues")
+        player.sendMessage(Text.literal("-------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
+        player.sendMessage(Text.literal("                           Configured Inventory's Summary/Help"), false);
+        player.sendMessage(Text.literal("/inventory set (integer) - sets the inventory droprate "), false);
+        player.sendMessage(Text.literal("/inventory on/off - turns the mod on and off"), false);
+        player.sendMessage(Text.literal("/inventory get info - sends all the info about the config values of the mod back to the player"), false);
+        player.sendMessage(Text.literal("/inventory get summary - sends this message to the player"), false);
+        player.sendMessage(Text.literal("/inventory add item (item) - adds an item to the item save list."), false);
+        player.sendMessage(Text.literal("/inventory add name (name) - adds an name to the name save list. "), false);
+        player.sendMessage(Text.literal("/inventory remove item (item) - removes an item from the item save list"), false);
+        player.sendMessage(Text.literal("/inventory remove name (name) - removes an item from the name save list"), false);
+        player.sendMessage(Text.literal("/inventory disable vanishing - makes the vanishing curse ineffective and now they drop like normal"), false);
+        player.sendMessage(Text.literal("/inventory disable binding - makes the binding curse ineffective"), false);
+        player.sendMessage(Text.literal("/inventory enable binding - turns binding back on"), false);
+        player.sendMessage(Text.literal("/inventory enable vanishing - turns vanishing back on"), false);
+        player.sendMessage(Text.literal("/inventory roundUp - experimental feature, tells inventory to round up or not"), false);
+        player.sendMessage(Text.literal("/inventory help  - also displays this message"), false);
+        player.sendMessage(Text.literal("--------------------------------------------------------------------------------------").formatted(Formatting.AQUA), false);
+        player.sendMessage(Text.literal("Issues ? : https://github.com/OverlordsIII/ConfiguredKeepInventory/issues")
                 .styled(style -> style.withHoverEvent(
                         new HoverEvent(HoverEvent.Action.SHOW_TEXT
-                                , new LiteralText("Configured Keep Inventory Repository")))
+                                , Text.literal("Configured Keep Inventory Github Repository")))
                         .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL
                                 , "https://github.com/OverlordsIII/ConfiguredKeepInventory/issues")))
                 , false);

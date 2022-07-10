@@ -102,6 +102,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             }
         }
     }
+    //soft override better or worse than redirect?
+    //still up for debate
     @Inject(method = "dropInventory", at = @At("HEAD"), cancellable = true)
     public void safeInv(CallbackInfo ci){
         if (Config.enableConfig){

@@ -3,7 +3,6 @@
   "package": "io.github.overlordsiii.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "CommandManagerMixin",
     "DamageSourceInvoker",
     "EnchantmentHelperMixin",
     "LivingEntityMixin",
