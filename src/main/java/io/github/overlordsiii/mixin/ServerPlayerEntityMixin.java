@@ -50,7 +50,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method = "copyFrom", at = @At("TAIL"))
     private void changeXP(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        if (ConfiguredKeepInventory.Config.enableConfig && ConfiguredKeepInventory.Config.loseXpOnDeath && !this.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+        if (!alive && ConfiguredKeepInventory.Config.enableConfig && ConfiguredKeepInventory.Config.loseXpOnDeath && !this.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
             this.experienceLevel = 0;
             this.experienceProgress = 0;
             this.totalExperience = 0;
