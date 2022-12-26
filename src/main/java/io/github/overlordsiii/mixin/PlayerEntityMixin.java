@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static io.github.overlordsiii.ConfiguredKeepInventory.Config;
@@ -102,6 +103,15 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             }
         }
     }
+
+    @Redirect(method = "dropInventory", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;dropAll()V"))
+    public void safeInv(PlayerInventory instance) {
+        if (Config.enableConfig){
+            ((PlayerInventoryExt)this.inventory).dropInventory();
+        }
+    }
+
+/*
     //soft override better or worse than redirect?
     //still up for debate
     @Inject(method = "dropInventory", at = @At("HEAD"), cancellable = true)
@@ -110,6 +120,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
             ((PlayerInventoryExt)this.inventory).dropInventory();
             ci.cancel();
         }
+
+ */
     }
 
 
@@ -118,4 +130,3 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
 
 
-}

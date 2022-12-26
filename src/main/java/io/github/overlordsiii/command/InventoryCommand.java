@@ -16,15 +16,15 @@ import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.registry.Registry;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
@@ -119,7 +119,7 @@ public class InventoryCommand {
                 .formatted(Formatting.GRAY)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND
-                                , "/inventory sort " + literal + " " + Registry.ITEM.getId(itemToSort)))
+                                , "/inventory sort " + literal + " " + Registries.ITEM.getId(itemToSort)))
                         .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM,
                                 new HoverEvent.ItemStackContent(new ItemStack(itemToSort)))))
                 , true);
@@ -184,7 +184,7 @@ public class InventoryCommand {
         manager.save();
         return 1;
     }
-    private static int executeAdd(CommandContext<ServerCommandSource> ctx, ArrayList<String> list, String toAdd, String displayedText, String literal, @Nullable Item nullable) throws CommandSyntaxException {
+    private static int executeAdd(CommandContext<ServerCommandSource> ctx, ArrayList<String> list, String toAdd, String displayedText, String literal, Item nullable) throws CommandSyntaxException {
         if (!list.contains(toAdd)) {
             list.add(toAdd);
           String finalString = String.format(displayedText, toAdd);

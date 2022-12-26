@@ -4,6 +4,8 @@ import io.github.overlordsiii.ConfiguredKeepInventory;
 import io.github.overlordsiii.config.InventoryConfig;
 import io.github.overlordsiii.mixinterfaces.PlayerInventoryExt;
 import io.github.overlordsiii.util.CommandSourceUtil;
+
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -17,6 +19,7 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -58,10 +61,10 @@ public abstract class LivingEntityMixin extends Entity {
                                                 .formatted(Formatting.AQUA)))
                                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND
                                                         , suggestedCommand))),
-                                MessageType.SYSTEM);
+                                false);
                     }
                     else{
-                        entity.server.getPlayerManager().broadcast(Text.literal(entity.getName().getString() + " has used a totem!"), MessageType.SYSTEM);
+                        entity.server.getPlayerManager().broadcast(Text.literal(entity.getName().getString() + " has used a totem!"), false);
                         CommandSourceUtil
                                 .sendToOps(this.world.getServer().getCommandSource(), Text.literal(Config.helpFullDeathMessage)
                                         .formatted(Formatting.YELLOW).styled(style -> style
