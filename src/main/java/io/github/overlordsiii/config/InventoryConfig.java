@@ -75,4 +75,8 @@ public class InventoryConfig implements ConfigData {
     @ConfigEntry.Category("KeepInventoryConfig")
     @Comment("If this is on, xp will be lost on death")
     public boolean loseXpOnDeath = true;
+
+    @ConfigEntry.Category("KeepInventoryConfig")
+    @Comment("If this is on, named items will not be dropped")
+    public boolean namedItemsDoNotDrop = false;
 }

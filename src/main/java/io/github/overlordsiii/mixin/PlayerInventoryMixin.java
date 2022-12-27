@@ -46,7 +46,8 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
             ItemStack stack = stacks.get(i);
             List<String> namesSavedList = Config.namesSavedList;
             List<String> itemSaveList = Config.itemsSavedList;
-            boolean bl = !namesSavedList.contains(stack.getName().getString()) && !itemSaveList.contains(stack.getItem().toString());
+            boolean named = !Config.namedItemsDoNotDrop || !stack.hasCustomName();
+            boolean bl = !namesSavedList.contains(stack.getName().getString()) && !itemSaveList.contains(stack.getItem().toString()) && named;
             double percent = Config.configdroprate / 100.0;
             double newStackCount = (percent * stack.getCount());
             if (!stack.isEmpty()) {

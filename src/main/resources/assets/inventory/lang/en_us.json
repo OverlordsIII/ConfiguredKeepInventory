@@ -21,5 +21,6 @@
   "text.autoconfig.inventory.option.loseXpOnDeath": "Xp Lost on Death",
   "text.autoconfig.inventory.title": "Configured Inventory Mod Menu Config",
   "text.autoconfig.inventory.option.helpFullDeathMessages": "Helpfull Death Messages",
-  "text.autoconfig.inventory.option.helpFullDeathMessage": "Death Message (if enabled)"
+  "text.autoconfig.inventory.option.helpFullDeathMessage": "Death Message (if enabled)",
+  "text.autoconfig.inventory.option.namedItemsDoNotDrop": "Named Items Do Not Drop"
 }

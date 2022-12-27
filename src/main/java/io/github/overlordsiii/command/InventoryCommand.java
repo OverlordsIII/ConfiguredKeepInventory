@@ -56,7 +56,9 @@ public class InventoryCommand {
                     .then(literal("helpfulDeathMsg")
                         .executes(context -> executeToggle(context, config.helpFullDeathMessages, "Helpful Death Messages is now currently turned ", "helpfulDeathMsg")))
                     .then(literal("xpLostOnDeath")
-                        .executes(context -> executeToggle(context, config.loseXpOnDeath, "Xp Lost on death is now turned ", "xpLostOnDeath"))))
+                        .executes(context -> executeToggle(context, config.loseXpOnDeath, "Xp Lost on death is now turned ", "xpLostOnDeath")))
+                    .then(literal("namedItemsDoNotDrop")
+                        .executes(context -> executeToggle(context, config.namedItemsDoNotDrop, "Named Items Do Not Drop is now turned ", "namedItemsDoNotDrop"))))
                 .then(literal("set")
                     .then(literal("droprate")
                         .then(argument("droprate", IntegerArgumentType.integer(0, 100))
@@ -149,6 +151,7 @@ public class InventoryCommand {
             case "autoHungerReplenish": config.hungerReplenish = rule; break;
             case "helpfulDeathMsg": config.helpFullDeathMessages = rule; break;
             case "xpLostOnDeath": config.loseXpOnDeath = rule; break;
+            case "namedItemsDoNotDrop": config.namedItemsDoNotDrop = rule; break;
         }
         String added = rule ? "on" : "off";
         if (displayedText.contains("Vanishing") || displayedText.contains("Binding")){
