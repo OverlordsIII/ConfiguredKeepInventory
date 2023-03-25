@@ -10,10 +10,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.message.MessageType;
+import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -83,10 +86,11 @@ public abstract class LivingEntityMixin extends Entity {
         return instance.isOf(item);
     }
 
+
     @ModifyVariable(method = "tryUseTotem", at = @At(value = "HEAD", ordinal = 0), index = 1, argsOnly = true)
     private DamageSource makeTotemWorkOnKillCommand(DamageSource source){
-        if (source.isOutOfWorld() && Config.debugTotems && Config.enableConfig){
-            return ConfiguredKeepInventory.TOTEM_REPLACEMENT;
+        if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) && Config.debugTotems && Config.enableConfig){
+            return this.world.getDamageSources().cactus();
         }
         return source;
     }
