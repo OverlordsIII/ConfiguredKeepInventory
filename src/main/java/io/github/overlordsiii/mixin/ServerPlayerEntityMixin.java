@@ -39,8 +39,6 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
     }
 
 
-    @Shadow public abstract ServerWorld getWorld();
-
     @Shadow public abstract RegistryKey<World> getSpawnPointDimension();
 
     @Redirect(method = "copyFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/GameRules;getBoolean(Lnet/minecraft/world/GameRules$Key;)Z"))
@@ -50,7 +48,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     @Inject(method = "copyFrom", at = @At("TAIL"))
     private void changeXP(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
-        if (!alive && ConfiguredKeepInventory.Config.enableConfig && ConfiguredKeepInventory.Config.loseXpOnDeath && !this.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+        if (!alive && ConfiguredKeepInventory.Config.enableConfig && ConfiguredKeepInventory.Config.loseXpOnDeath && !this.getWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
             this.experienceLevel = 0;
             this.experienceProgress = 0;
             this.totalExperience = 0;

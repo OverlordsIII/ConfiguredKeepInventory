@@ -131,7 +131,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     public int indexOf(ItemStack stack) {
         for (int i = 0; i < this.main.size(); i++){
             ItemStack itemStack = this.main.get(i);
-            if (itemStack.isItemEqual(stack)){
+            if (itemStack.getItem().equals(stack.getItem())){
                 return i;
             }
         }
@@ -148,7 +148,7 @@ public abstract class PlayerInventoryMixin implements PlayerInventoryExt {
     public int indexOfArmor(ItemStack stack){
         for (int i = 0; i < this.armor.size(); i++){
             ItemStack stacker = this.armor.get(i);
-            if (stacker.isItemEqual(stack)){
+            if (stacker.getItem().equals(stack.getItem())){
                 return i;
             }
         }

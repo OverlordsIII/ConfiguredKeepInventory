@@ -98,7 +98,7 @@ public class InventoryCommand {
         config.helpFullDeathMessage = newString;
         String finalString = String.format(displayText, newString);
         final String finalNewString = newString;
-        ctx.getSource().sendFeedback(Text.literal(finalString)
+        ctx.getSource().sendFeedback(() -> Text.literal(finalString)
                 .formatted(Formatting.LIGHT_PURPLE)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -110,14 +110,14 @@ public class InventoryCommand {
     }
     private static int executeSortOffhand(CommandContext<ServerCommandSource> ctx, Item itemToSort, String literal, String displayText) {
         if (ctx.getSource().getPlayer() == null) {
-            ctx.getSource().sendFeedback(Text.literal("Run this command as a player!"), false);
+            ctx.getSource().sendFeedback(() -> Text.literal("Run this command as a player!"), false);
             return -1;
         }
 
        PlayerInventory inventory = ctx.getSource().getPlayer().getInventory();
         ((PlayerInventoryExt)inventory).sortOffHand(new ItemStack(itemToSort));
        String finalString =  String.format(displayText, itemToSort.toString());
-        ctx.getSource().sendFeedback(Text.literal(finalString)
+        ctx.getSource().sendFeedback(() -> Text.literal(finalString)
                 .formatted(Formatting.GRAY)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND
@@ -153,11 +153,13 @@ public class InventoryCommand {
             case "xpLostOnDeath": config.loseXpOnDeath = rule; break;
             case "namedItemsDoNotDrop": config.namedItemsDoNotDrop = rule; break;
         }
-        String added = rule ? "on" : "off";
+        String added;
         if (displayedText.contains("Vanishing") || displayedText.contains("Binding")){
             added = rule ? "off" : "on";
+        } else {
+            added = rule ? "on" : "off";
         }
-        ctx.getSource().sendFeedback(Text.literal(displayedText + added)
+        ctx.getSource().sendFeedback(() -> Text.literal(displayedText + added)
                 .formatted(Formatting.GRAY)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND
@@ -176,7 +178,8 @@ public class InventoryCommand {
             case "droprate": config.configdroprate = current;
             case "hungerRefresh": config.hungerRefreshLimit = current;
         }
-        ctx.getSource().sendFeedback(Text.literal(displayedtext + current + " " + percent)
+        int finalCurrent = current;
+        ctx.getSource().sendFeedback(() -> Text.literal(displayedtext + finalCurrent + " " + percent)
                 .formatted(Formatting.WHITE)
                 .styled(style -> style.withItalic(true)
                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND
@@ -192,7 +195,7 @@ public class InventoryCommand {
             list.add(toAdd);
           String finalString = String.format(displayedText, toAdd);
           if (nullable != null) {
-              ctx.getSource().sendFeedback(Text.literal(finalString)
+              ctx.getSource().sendFeedback( () -> Text.literal(finalString)
                       .formatted(Formatting.GOLD)
                       .styled(style -> style.withItalic(true)
                               .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -203,7 +206,7 @@ public class InventoryCommand {
                       , true);
           }
           else{
-              ctx.getSource().sendFeedback(Text.literal(finalString)
+              ctx.getSource().sendFeedback(() -> Text.literal(finalString)
                       .formatted(Formatting.GOLD)
                       .styled(style -> style.withItalic(true)
                               .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -223,7 +226,7 @@ public class InventoryCommand {
             list.remove(toRemove);
             String finalString = String.format(displayedText, toRemove);
             if (nullable != null){
-                ctx.getSource().sendFeedback(Text.literal(finalString)
+                ctx.getSource().sendFeedback(() -> Text.literal(finalString)
                                 .formatted(Formatting.AQUA)
                                 .styled(style -> style.withItalic(true)
                                         .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
@@ -234,7 +237,7 @@ public class InventoryCommand {
                         , true);
             }
             else{
-                ctx.getSource().sendFeedback(Text.literal(finalString)
+                ctx.getSource().sendFeedback(() -> Text.literal(finalString)
                         .formatted(Formatting.AQUA)
                         .styled(style -> style.withItalic(true)
                                 .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,

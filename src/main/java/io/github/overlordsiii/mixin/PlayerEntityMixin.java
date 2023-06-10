@@ -89,12 +89,12 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                 int slot = ((PlayerInventoryExt) this.inventory).indexOfFood();
                 if (slot != -1) {
                     ItemStack stack = this.inventory.main.get(slot);
-                    this.eatFood(this.world, stack);
+                    this.eatFood(this.getWorld(), stack);
                     this.spawnConsumptionEffects(stack, 5);
                 }
                 else if (this.inventory.offHand.get(0).getItem().isFood()){
                     ItemStack stack = this.inventory.offHand.get(0);
-                    this.eatFood(this.world, stack);
+                    this.eatFood(this.getWorld(), stack);
                     this.spawnConsumptionEffects(stack, 5);
                 }
                 if (!this.hungerManager.isNotFull()) {

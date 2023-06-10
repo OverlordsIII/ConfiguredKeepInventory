@@ -49,14 +49,14 @@ public abstract class LivingEntityMixin extends Entity {
                 int slot = ((PlayerInventoryExt)entity.getInventory()).indexOf(new ItemStack(Items.TOTEM_OF_UNDYING));
                 if (Config.helpFullDeathMessages) {
                     String suggestedCommand;
-                    if (!entity.world.getDimension().equals(Objects.requireNonNull(entity.server.getWorld(entity.getSpawnPointDimension())).getDimension())){
-                        suggestedCommand = "/execute in " + entity.world.getRegistryKey().getValue() + " run teleport " + this.getX() + " " + this.getY() + " " + this.getZ();
+                    if (!entity.getWorld().getDimension().equals(Objects.requireNonNull(entity.server.getWorld(entity.getSpawnPointDimension())).getDimension())){
+                        suggestedCommand = "/execute in " + entity.getWorld().getRegistryKey().getValue() + " run teleport " + this.getX() + " " + this.getY() + " " + this.getZ();
                     }
                     else{
                         suggestedCommand = "/tp " + this.getX() + " " + this.getY() + " " + this.getZ();
                     }
                     if (!Config.needsOP) {
-                        entity.world.getServer().getPlayerManager().broadcast(
+                        entity.getWorld().getServer().getPlayerManager().broadcast(
                                 Text.literal(entity.getName().getString() + " has used a totem!")
                                         .formatted(Formatting.YELLOW)
                                         .styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT
@@ -69,7 +69,7 @@ public abstract class LivingEntityMixin extends Entity {
                     else{
                         entity.server.getPlayerManager().broadcast(Text.literal(entity.getName().getString() + " has used a totem!"), false);
                         CommandSourceUtil
-                                .sendToOps(this.world.getServer().getCommandSource(), Text.literal(Config.helpFullDeathMessage)
+                                .sendToOps(this.getWorld().getServer().getCommandSource(), Text.literal(Config.helpFullDeathMessage)
                                         .formatted(Formatting.YELLOW).styled(style -> style
                                                 .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, suggestedCommand))));
                     }
@@ -90,7 +90,7 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyVariable(method = "tryUseTotem", at = @At(value = "HEAD", ordinal = 0), index = 1, argsOnly = true)
     private DamageSource makeTotemWorkOnKillCommand(DamageSource source){
         if (source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY) && Config.debugTotems && Config.enableConfig){
-            return this.world.getDamageSources().cactus();
+            return this.getWorld().getDamageSources().cactus();
         }
         return source;
     }
